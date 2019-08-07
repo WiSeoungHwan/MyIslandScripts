@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 public class StartSceneManager : MonoBehaviourPunCallbacks {
 
 	[SerializeField]
 	private int maxPlayers;
+
+	[SerializeField]
+	private bool isMultiplay = false;
 
 	// Use this for initialization
 	void Start () {
@@ -59,6 +63,10 @@ public class StartSceneManager : MonoBehaviourPunCallbacks {
 	// Public
 
 	public void StartButtonTap(){
-		PhotonNetwork.JoinRandomRoom();
+		if (isMultiplay){
+			PhotonNetwork.JoinRandomRoom();
+		}else{
+			SceneManager.LoadScene(2);
+		}
 	}
 }

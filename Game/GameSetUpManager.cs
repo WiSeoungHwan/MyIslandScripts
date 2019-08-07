@@ -71,8 +71,6 @@ public class GameSetUpManager : MonoBehaviourPunCallbacks, IPunObservable
         if (PhotonNetwork.IsMasterClient)
         {
             
-            tileStateArr[0] = myGround.CreateGround();
-            tileStateArr[1] = enemyGround.CreateGround(); 
         }
         
     }
@@ -83,9 +81,6 @@ public class GameSetUpManager : MonoBehaviourPunCallbacks, IPunObservable
         if (!PhotonNetwork.IsMasterClient)
         {
             Debug.Log(data[0].Length);
-
-            myGround.CreateGroundForClient(data[1]);
-            enemyGround.CreateGroundForClient(data[0]);
             var player = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity).GetComponent<PlayerScript>();
         }
     }

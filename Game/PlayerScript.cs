@@ -91,8 +91,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     private void Collect(RaycastHit hitInfo){
         if (hitInfo.transform.tag == ConstData.material){
             Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
-            if (tile.index == playerIndex + 5 || tile.index == playerIndex - 5 || tile.index == playerIndex + 1 || tile.index == playerIndex - 1){
-                tile.ResetTilePrefab(TileState.normal);
+            if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1){
+                // tile.ResetTilePrefab(TileState.normal);
                 CheckAround();
             }
         }
@@ -178,7 +178,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
             
 			if(ground.tileArr[aroundIndex] == null) {continue;}
             Tile tile = ground.tileArr[aroundIndex];
-            switch (tile.state)
+            switch (tile.tileData.tileState)
             {
                 case TileState.normal:
                     i.SetActive(true);

@@ -23,8 +23,9 @@ public class NetworkController : MonoBehaviourPunCallbacks {
     }
 
 	void Start () {
-		PhotonNetwork.GameVersion = gameVersion.ToString();
-		PhotonNetwork.ConnectUsingSettings();
+		// multiplay
+		// PhotonNetwork.GameVersion = gameVersion.ToString();
+		// PhotonNetwork.ConnectUsingSettings();
 	}
 	
 	public override void OnConnectedToMaster(){
