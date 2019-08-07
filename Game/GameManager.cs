@@ -10,6 +10,10 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private Ground playerGround;
     [SerializeField]
     private Ground enemyGround;
+    [SerializeField]
+    private UnitManager playerUnitManager;
+    [SerializeField]
+    private UnitManager enemyUnitManager;
     #endregion
 
     #region MonoBehaviour Callbacks
@@ -21,8 +25,15 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     
     #region private Methods
     private void GameInit(){
+        // Ground Init
         playerGround.InitGround();
         enemyGround.InitGround();
+        
+        // Player Init
+        playerUnitManager.PlayerInit(playerGround);
+        enemyUnitManager.PlayerInit(enemyGround);
+
+
     }
     #endregion
 

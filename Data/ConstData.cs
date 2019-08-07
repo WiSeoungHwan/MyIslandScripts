@@ -10,6 +10,8 @@ public static class ConstData
     public static int materialInitNum = 5;
 
     public static int playerInstanceIndex = 12;
+    public static int materialDamage = 1;
+    public static int materialHp = 100;
 
     public static string practicableAreaTag = "PracticableArea";
 

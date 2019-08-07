@@ -83,13 +83,10 @@ public class Ground : MonoBehaviour
                     // 본게임: 자원마다 정해지는 양에서 랜덤 넣기 
                     // 미구현
                 }
+				tileData.hp = ConstData.materialHp;
                 tile.TileSetup(tileData);
+				tileArr.Add(tile);
                 tileDatas.Add(tileData);
-                Debug.Log("Tile index: " + tileData.index + "\n" +
-                    "Tile State: " + tileData.tileState + "\n" +
-                "Tile Material State: " + tileData.materialState + "\n" +
-                "Tile Building : " + tileData.buildingState + "\n" +
-                "Tile Tower State: " + tileData.towerState);
                 index++;
             }
         }

@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 
-public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
+public class PlayerScript : MonoBehaviour
 {
 
     // MARK: - Private Fields
@@ -14,85 +13,66 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField]
     Material normalMaterial;
 
-	private Ground ground;
-    private PhotonView _photonView;
+    private Ground ground;
+
     private int playerIndex = 0;
     private int enemyIndex = 0;
 
+    private bool isMine;
+
     // MARK: - Public Fields
-
-    // MARK: - IPunObservable
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info){
-        if (stream.IsWriting){  // 데이터를 보내는것
-            stream.SendNext(playerIndex);
-        }else{ // 받는것 
-            enemyIndex = (int)stream.ReceiveNext();
-            EnemyUpdate(enemyIndex);
-        }
-    }
 
     // MARK: - MonoBehaviour
 
-    // Use this for initialization
     void Start()
     {
-        _photonView = GetComponent<PhotonView>();
-        Debug.Log("Is Master Client? " + PhotonNetwork.IsMasterClient);
-        PlayerSetUp();
     }
 
     // Update is called once per frame
     void Update()
     {
-		PlayerAction();
+        PlayerAction();
+    }
+
+    // MARK: - Public Methods 
+
+    public void PlayerInit(Ground ground, bool isMine, int startIndex){
+        this.isMine = isMine;
+        this.ground = ground;
+        this.playerIndex = startIndex;
     }
 
     // MARK: - Pirvate Methods
-    private void EnemyUpdate(int currentEnemyIndex){ // 적의 이동이벤트가 왔을때 호출 
-        if (photonView.IsMine) {return;}
-        if (!ground) {Debug.Log("Player script - EnemyUpdate: ground is null"); return;}
-        var pos = ground.tileArr[currentEnemyIndex].transform.position;
-        gameObject.transform.position = new Vector3(pos.x, transform.position.y, pos.z);
-    }
-    public void PlayerSetUp()
-    {
-        if (_photonView.IsMine)
-        {
-            transform.position = Vector3.zero;
-            ground = GameObject.Find("MyGround").GetComponent<Ground>();
-        }
-        else
-        {
-            transform.position = new Vector3(ConstData.enemyGroundXPos, 0, 0);
-            ground = GameObject.Find("EnemyGround").GetComponent<Ground>();
-        }
-        CheckAround();
-    }
 
     private void PlayerAction()
     {
-        if (!_photonView.IsMine){return;}
-        // click the ground 
-        if (Input.GetMouseButtonDown(0))
+        if (isMine)
         {
-            // get hitInfo
-            RaycastHit hitInfo;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out hitInfo))
+            // click the ground 
+            if (Input.GetMouseButtonDown(0))
             {
-                Move(hitInfo);
-                Collect(hitInfo);
+                // get hitInfo
+                RaycastHit hitInfo;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out hitInfo))
+                {
+                    Move(hitInfo);
+                    Collect(hitInfo);
+                }
             }
         }
     }
 
-    private void Collect(RaycastHit hitInfo){
-        if (hitInfo.transform.tag == ConstData.material){
+    private void Collect(RaycastHit hitInfo)
+    {
+        if (hitInfo.transform.tag == ConstData.material)
+        {
             Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
-            if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1){
+            if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
+            {
                 // tile.ResetTilePrefab(TileState.normal);
+                tile.MaterialHit(ConstData.materialDamage);
                 CheckAround();
             }
         }
@@ -132,13 +112,7 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
 
     private void CheckAround()
     {
-        if(ground.tileArr.Count == 0){return;}
-		if(!_photonView.IsMine){
-			foreach (GameObject i in practicableAreas){
-				i.SetActive(false);
-			}
-			return;
-		}
+
         foreach (GameObject i in practicableAreas)
         {
             int aroundIndex = 0;
@@ -175,8 +149,8 @@ public class PlayerScript : MonoBehaviourPunCallbacks, IPunObservable
                 i.SetActive(false);
                 continue;
             }
-            
-			if(ground.tileArr[aroundIndex] == null) {continue;}
+
+            if (ground.tileArr[aroundIndex] == null) { continue; }
             Tile tile = ground.tileArr[aroundIndex];
             switch (tile.tileData.tileState)
             {

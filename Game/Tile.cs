@@ -19,20 +19,13 @@ public class Tile: MonoBehaviour{
 		hpText.rectTransform.Rotate(Vector3.forward);
 	}
 
-	// public void SetTilePrefab(){
-	// 	switch (state){
-	// 		case TileState.normal:
-	// 			loadPrefabs(ConstData.normal);
-	// 			break;
-	// 		case TileState.material:
-	// 			loadPrefabs(ConstData.material);
-	// 			break;
-	// 		case TileState.building:
-	// 			loadPrefabs(ConstData.building);
-	// 			break;
-	// 	}
-	// }
-
+	public void MaterialHit(int damage){
+		this.tileData.hp -= damage;
+		if(this.tileData.hp < 0){
+			this.tileData.hp = 0;
+		}
+		hpText.text = this.tileData.hp.ToString();
+	}
 	public void TileSetup(TileData tile){
 		// tile data 에 따라 프리펩 로드
 		// 우선 기반 타일 로드
@@ -66,14 +59,6 @@ public class Tile: MonoBehaviour{
 		}
 	}
 
-	// public void ResetTilePrefab(TileState state){
-	// 	this.state = state;
-	// 	GameObject go = gameObject.transform.GetChild(0).gameObject;
-	// 	Destroy(go);
-	// 	SetTilePrefab();
-	// }
-	
-
 	private void loadPrefabs(string forderName, string tag){
 		if (Resources.LoadAll("Tile/"+forderName) == null){Debug.Log("Err: "+forderName+"is null");return;}
 		Object[] prefabArr = Resources.LoadAll("Tile/"+forderName);
@@ -86,7 +71,7 @@ public class Tile: MonoBehaviour{
 			colider = gameObject.AddComponent<BoxCollider>();
 		}
 		colider = gameObject.GetComponent<BoxCollider>();
-		if (tag == ConstData.material){
+		if (tag != ConstData.normal){
 			hpText.transform.gameObject.SetActive(true);
 			colider.size = new Vector3(1,1.5f,1);
 			colider.center = new Vector3(0,0.5f,0);
