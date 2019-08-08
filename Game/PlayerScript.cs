@@ -20,12 +20,14 @@ public class PlayerScript : MonoBehaviour
     private int enemyIndex = 0;
 
     private bool isMine;
-    public delegate void Callback(MaterialState materialState, int num);
- 
-    private Callback callback = null;
+    public delegate void MaterialHit(MaterialState materialState, int num);
+    public delegate bool MoveCount();
+
+    private MaterialHit materialHit = null;
+    private MoveCount moveCount = null;
 
     // MARK: - Public Fields
-    
+
     // MARK: - MonoBehaviour
 
     void Start()
@@ -40,17 +42,20 @@ public class PlayerScript : MonoBehaviour
 
     // MARK: - Public Methods 
 
-    public void PlayerInit(Ground ground, bool isMine, int startIndex){
+    public void PlayerInit(Ground ground, bool isMine, int startIndex)
+    {
         this.isMine = isMine;
         this.ground = ground;
         this.playerIndex = startIndex;
     }
 
-    public void SetMaterialTapCallBack(Callback col){
-        callback = col;
+    public void SetCallBacks(MaterialHit materialHit, MoveCount moveCount)
+    {
+        this.materialHit = materialHit;
+        this.moveCount = moveCount;
     }
 
-    
+
 
     // MARK: - Pirvate Methods
 
@@ -68,13 +73,22 @@ public class PlayerScript : MonoBehaviour
 
                 if (Physics.Raycast(ray, out hitInfo))
                 {
-                    Move(hitInfo);
-                    Collect(hitInfo);
+                    if (hitInfo.transform.tag == "PracticableArea" || hitInfo.transform.tag == "Material")
+                    {
+                        if (moveCount())
+                        {
+                            Move(hitInfo);
+                            Collect(hitInfo);
+                        }
+                    }
+
                 }
             }
-        }else{
+        }
+        else
+        {
             // 2P 
-
+            // if(Input.GetKeyDown(KeyCode.UpArrow))
         }
     }
 
@@ -87,7 +101,7 @@ public class PlayerScript : MonoBehaviour
             {
                 // tile.ResetTilePrefab(TileState.normal);
                 tile.MaterialHit(ConstData.materialDamage);
-                callback(tile.tileData.materialState, ConstData.materialDamage);
+                materialHit(tile.tileData.materialState, ConstData.materialDamage);
                 CheckAround();
             }
         }
@@ -95,7 +109,6 @@ public class PlayerScript : MonoBehaviour
 
     private void Move(RaycastHit hitInfo)
     {
-
         float rotateY = 90;
         switch (hitInfo.transform.name)
         {

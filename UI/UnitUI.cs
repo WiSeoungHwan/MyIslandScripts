@@ -19,6 +19,12 @@ public class UnitUI : MonoBehaviour
     [SerializeField]
     private Text adamantiumText;
 
+    [SerializeField]
+    private Text unitActiveCount;
+
+    [SerializeField]
+    private Text unitHP;
+
     #endregion
 
     #region MonoBehaviourCallBacks
@@ -49,6 +55,11 @@ public class UnitUI : MonoBehaviour
 
         adamantiumText.text = "Adam: " + playerData.materialData.adamantium;
 
+    }
+    
+    public void UintUIUpdate(PlayerData playerData){
+        unitActiveCount.text = playerData.activeCount.ToString();
+        unitHP.text = playerData.hp.ToString();
     }
 
     #endregion

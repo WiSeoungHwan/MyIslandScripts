@@ -4,12 +4,16 @@ using System.Collections.Generic;
 
 public static class ConstData
 {
+    // game 
+    public static int playTime = 5;
+    public static int totalTurn = 60;
+    public static int activeCount = 5;
+
     // player
     public static int playerInstanceIndex = 12;
     public static int mapSize = 5;
     public static int enemyGroundXPos = -7;
     public static int playerHp = 10;
-    public static int activeCount = 5;
 
     // material
     public static int materialInitNum = 5;

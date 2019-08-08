@@ -11,6 +11,8 @@ public class UnitManager : MonoBehaviour
 
     [SerializeField]
     private UnitUI unitUIController;
+    [SerializeField]
+    private GameObject playerObject;
 
     #endregion
     #region Private Field
@@ -44,17 +46,34 @@ public class UnitManager : MonoBehaviour
         this.playerData.materialData = new MaterialData();
 
         // Player Object Instantiate
-        if(!Resources.Load("Player")){Debug.Log("Player prefab is not found");}
+        // if(!Resources.Load("Player")){Debug.Log("Player prefab is not found");}
         var pos = isMine ? new Vector3(2,0,2) : new Vector3(-5,0,2);
-        var playerObject = Instantiate((Resources.Load("Player") as GameObject),pos, Quaternion.identity);
+        // var playerObject = Instantiate((Resources.Load("Player") as GameObject),pos, Quaternion.identity);
         playerObject.transform.SetParent(transform);
+        playerObject.transform.position = pos;
         this.player = playerObject.GetComponent<PlayerScript>();
         this.player.PlayerInit(ground, isMine, ConstData.playerInstanceIndex);
-        this.player.SetMaterialTapCallBack(SetUnitMatrialUI);
+        this.player.SetCallBacks(SetUnitMatrialUI,UnitMoveCount);
+    }
+
+    public void ResetPlayerActiveCount(){
+        playerData.activeCount = ConstData.activeCount;
+        unitUIController.UintUIUpdate(this.playerData);
     }
     #endregion
 
     #region Private Methods
+
+    private bool UnitMoveCount(){
+        if(playerData.activeCount <= 0){
+            // 카운트를 다 쓴 상황 
+            unitUIController.UintUIUpdate(this.playerData);
+            return false;
+        }
+        playerData.activeCount--;
+        unitUIController.UintUIUpdate(this.playerData);
+        return true;
+    }
 
     private void SetUnitMatrialUI(MaterialState materialKind, int num){
 
