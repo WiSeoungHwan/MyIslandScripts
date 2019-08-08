@@ -44,6 +44,7 @@ public class UnitManager : MonoBehaviour
         this.playerData.hp = ConstData.playerHp;
         this.playerData.activeCount = ConstData.activeCount;
         this.playerData.materialData = new MaterialData();
+        unitUIController.UintUIUpdate(this.playerData);
 
         // Player Object Instantiate
         // if(!Resources.Load("Player")){Debug.Log("Player prefab is not found");}

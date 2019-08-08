@@ -87,8 +87,8 @@ public class PlayerScript : MonoBehaviour
         }
         else
         {
-            // 2P 
-            // if(Input.GetKeyDown(KeyCode.UpArrow))
+            //2P
+            EnemyInput();
         }
     }
 
@@ -106,6 +106,65 @@ public class PlayerScript : MonoBehaviour
             }
         }
     }
+
+    private void EnemyInput()
+    {
+        int inputIndex = 0;
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            inputIndex = -5;
+            EnemyAction(inputIndex);
+        }
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            inputIndex = 5;
+            EnemyAction(inputIndex);
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            inputIndex = 1;
+            if ((playerIndex + inputIndex) % 5 == 0) { return; }
+            EnemyAction(inputIndex);
+        }
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (playerIndex % 5 == 0) { return; }
+            inputIndex = -1;
+            EnemyAction(inputIndex);
+        }
+
+    }
+
+    private void EnemyAction(int inputIndex)
+    {
+        if (playerIndex + inputIndex < 0 || playerIndex + inputIndex > 24) { return; }
+        Tile tile = ground.tileArr[playerIndex + inputIndex];
+        switch (tile.tileData.tileState)
+        {
+            case TileState.normal:
+                if (moveCount())
+                {
+                    playerIndex += inputIndex;
+                    gameObject.transform.position = new Vector3(tile.transform.position.x, transform.position.y, tile.transform.position.z);
+                }
+                break;
+            case TileState.material:
+                if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
+                {
+                    if(moveCount()){
+                        tile.MaterialHit(ConstData.materialDamage);
+                        materialHit(tile.tileData.materialState, ConstData.materialDamage);
+                        CheckAround();
+                    }
+                }
+                break;
+            case TileState.building:
+                Debug.Log("building");
+                break;
+        }
+        CheckAround();
+    }
+
 
     private void Move(RaycastHit hitInfo)
     {

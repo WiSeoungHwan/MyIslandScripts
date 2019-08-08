@@ -54,7 +54,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         if (currentTime <= 0){ // 턴이 끝나는 상황 
             currentTurn--;
             playerUnitManager.ResetPlayerActiveCount();
-            // enemyUnitManager.ResetPlayerActiveCount();
+            enemyUnitManager.ResetPlayerActiveCount();
             currentTime = ConstData.playTime;
         }
         this.timeText.text = "Time: "  + currentTime;
