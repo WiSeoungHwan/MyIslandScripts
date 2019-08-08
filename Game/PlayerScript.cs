@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -19,9 +20,12 @@ public class PlayerScript : MonoBehaviour
     private int enemyIndex = 0;
 
     private bool isMine;
+    public delegate void Callback(MaterialState materialState, int num);
+ 
+    private Callback callback = null;
 
     // MARK: - Public Fields
-
+    
     // MARK: - MonoBehaviour
 
     void Start()
@@ -42,12 +46,19 @@ public class PlayerScript : MonoBehaviour
         this.playerIndex = startIndex;
     }
 
+    public void SetMaterialTapCallBack(Callback col){
+        callback = col;
+    }
+
+    
+
     // MARK: - Pirvate Methods
 
     private void PlayerAction()
     {
         if (isMine)
         {
+            // 1P
             // click the ground 
             if (Input.GetMouseButtonDown(0))
             {
@@ -61,6 +72,9 @@ public class PlayerScript : MonoBehaviour
                     Collect(hitInfo);
                 }
             }
+        }else{
+            // 2P 
+
         }
     }
 
@@ -73,6 +87,7 @@ public class PlayerScript : MonoBehaviour
             {
                 // tile.ResetTilePrefab(TileState.normal);
                 tile.MaterialHit(ConstData.materialDamage);
+                callback(tile.tileData.materialState, ConstData.materialDamage);
                 CheckAround();
             }
         }

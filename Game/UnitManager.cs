@@ -9,9 +9,14 @@ public class UnitManager : MonoBehaviour
     [SerializeField]
     private bool isMine = true;
 
+    [SerializeField]
+    private UnitUI unitUIController;
+
     #endregion
     #region Private Field
     private PlayerScript player;
+    private PlayerData playerData;
+
     // Start is called before the first frame update
     #endregion
 
@@ -32,12 +37,44 @@ public class UnitManager : MonoBehaviour
 
     #region Public Methods
     public void PlayerInit(Ground ground){
+        // Player Data set up 
+        this.playerData = new PlayerData();
+        this.playerData.hp = ConstData.playerHp;
+        this.playerData.activeCount = ConstData.activeCount;
+        this.playerData.materialData = new MaterialData();
+
+        // Player Object Instantiate
         if(!Resources.Load("Player")){Debug.Log("Player prefab is not found");}
         var pos = isMine ? new Vector3(2,0,2) : new Vector3(-5,0,2);
         var playerObject = Instantiate((Resources.Load("Player") as GameObject),pos, Quaternion.identity);
         playerObject.transform.SetParent(transform);
         this.player = playerObject.GetComponent<PlayerScript>();
         this.player.PlayerInit(ground, isMine, ConstData.playerInstanceIndex);
+        this.player.SetMaterialTapCallBack(SetUnitMatrialUI);
+    }
+    #endregion
+
+    #region Private Methods
+
+    private void SetUnitMatrialUI(MaterialState materialKind, int num){
+
+        switch(materialKind){
+            case MaterialState.wood:
+                playerData.materialData.wood += num;
+                break;
+            case MaterialState.stone:
+                playerData.materialData.stone += num;
+                break;
+            case MaterialState.iron:
+                playerData.materialData.iron += num;
+                break;
+            case MaterialState.adamantium:
+                playerData.materialData.adamantium += num;
+                break;
+            default:
+                break;
+        }
+        unitUIController.MaterialUIUpdate(this.playerData);
     }
     #endregion
 }

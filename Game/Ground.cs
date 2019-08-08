@@ -80,10 +80,12 @@ public class Ground : MonoBehaviour
                     materialInitNum--;
                     // 프로토타입용: 나무데이터를 넣는다 (임시)
                     tileData.materialState = MaterialState.wood;
+					tileData.hp = ConstData.materialHp;
                     // 본게임: 자원마다 정해지는 양에서 랜덤 넣기 
+					// 본게임: 어떤 자원인지 분기 처리 후 체력도 분기 처리 필요 
                     // 미구현
                 }
-				tileData.hp = ConstData.materialHp;
+				
                 tile.TileSetup(tileData);
 				tileArr.Add(tile);
                 tileDatas.Add(tileData);
