@@ -75,6 +75,7 @@ public class Tile: MonoBehaviour{
 			hpText.transform.gameObject.SetActive(true);
 			colider.size = new Vector3(1,1.5f,1);
 			colider.center = new Vector3(0,0.5f,0);
+			prefabObject.transform.position = new Vector3(transform.position.x, -0.2f,transform.position.z);
 		}else{
 			hpText.transform.gameObject.SetActive(false);
 			colider.size = Vector3.one;

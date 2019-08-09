@@ -31,6 +31,7 @@ public enum TowerState{
 [System.Serializable]
 public class TileData 
 {
+    public bool isMine = false;
     public int index = 0;
     public int hp = 0;
     public TileState tileState = TileState.normal;

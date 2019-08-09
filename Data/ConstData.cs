@@ -24,7 +24,6 @@ public static class ConstData
 
     // tag
     public static string practicableAreaTag = "PracticableArea";
-
     public static string normal = "Normal";
     public static string material = "Material";
     public static string building = "Building";

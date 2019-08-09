@@ -73,15 +73,25 @@ public class PlayerScript : MonoBehaviour
 
                 if (Physics.Raycast(ray, out hitInfo))
                 {
-                    if (hitInfo.transform.tag == "PracticableArea" || hitInfo.transform.tag == "Material")
+                    if (hitInfo.transform.gameObject.GetComponent<Tile>())
                     {
-                        if (moveCount())
+                        Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
+                        if(!tile.tileData.isMine){return;} // 적의 타일을 클릭시 
+                        if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
                         {
-                            Move(hitInfo);
-                            Collect(hitInfo);
+                            if(!moveCount()){return;}
+                            switch (tile.tileData.tileState){
+                                case TileState.normal:
+                                    Move(tile);
+                                    break;
+                                case TileState.material:
+                                    Collect(tile);
+                                    break;
+                                case TileState.building:
+                                    break;
+                            }
                         }
                     }
-
                 }
             }
         }
@@ -92,20 +102,20 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    private void Collect(RaycastHit hitInfo)
+    private void Collect(Tile tile)
     {
-        if (hitInfo.transform.tag == ConstData.material)
-        {
-            Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
-            if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
-            {
-                // tile.ResetTilePrefab(TileState.normal);
-                tile.MaterialHit(ConstData.materialDamage);
-                materialHit(tile.tileData.materialState, ConstData.materialDamage);
-                CheckAround();
-            }
-        }
+        tile.MaterialHit(ConstData.materialDamage);
+        materialHit(tile.tileData.materialState, ConstData.materialDamage);
+        CheckAround();
     }
+    private void Move(Tile tile)
+    {
+        var pos = tile.transform.position;
+        gameObject.transform.position = new Vector3(pos.x, transform.position.y, pos.z);
+        playerIndex = tile.tileData.index;
+
+    }
+
 
     private void EnemyInput()
     {
@@ -151,7 +161,8 @@ public class PlayerScript : MonoBehaviour
             case TileState.material:
                 if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
                 {
-                    if(moveCount()){
+                    if (moveCount())
+                    {
                         tile.MaterialHit(ConstData.materialDamage);
                         materialHit(tile.tileData.materialState, ConstData.materialDamage);
                         CheckAround();
@@ -165,37 +176,6 @@ public class PlayerScript : MonoBehaviour
         CheckAround();
     }
 
-
-    private void Move(RaycastHit hitInfo)
-    {
-        float rotateY = 90;
-        switch (hitInfo.transform.name)
-        {
-            case "X1":
-                rotateY = 90;
-                playerIndex += 5; // down
-                break;
-            case "X-1":
-                rotateY = -90;
-                playerIndex -= 5; // up 
-                break;
-            case "Z1":
-                rotateY = 0;
-                playerIndex += 1; // left
-                break;
-            case "Z-1":
-                rotateY = 180;
-                playerIndex -= 1; // right
-                break;
-        }
-        if (hitInfo.transform.tag == "PracticableArea")
-        {
-            transform.Find("Body").transform.rotation = Quaternion.Euler(new Vector3(0, rotateY, 0));
-            var pos = hitInfo.transform.position;
-            gameObject.transform.position = new Vector3(pos.x, transform.position.y, pos.z);
-            CheckAround();
-        }
-    }
 
     private void CheckAround()
     {

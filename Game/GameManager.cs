@@ -35,8 +35,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     #region private Methods
     private void GameInit(){
         // Ground Init
-        playerGround.InitGround();
-        enemyGround.InitGround();
+        playerGround.InitGround(true);
+        enemyGround.InitGround(false);
         
         // Player Init
         playerUnitManager.PlayerInit(playerGround);

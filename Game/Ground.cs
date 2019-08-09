@@ -32,12 +32,12 @@ public class Ground : MonoBehaviour
     // MARK: - Public Methods
 
 
-    public void InitGround()
+    public void InitGround(bool isMine)
     {
-        tileDatas = GroundTileDataInit();
+        tileDatas = GroundTileDataInit(isMine);
     }
 
-    public List<TileData> GroundTileDataInit()
+    public List<TileData> GroundTileDataInit(bool isMine)
     {
         var index = 0;
         // 초기에 주어지는 자원의 숫자 
@@ -48,6 +48,7 @@ public class Ground : MonoBehaviour
             for (int j = 0; j < ConstData.mapSize; j++)
             {
                 TileData tileData = new TileData();
+                tileData.isMine = isMine;
                 tileData.index = index;
                 Vector3 pos = new Vector3(i + transform.position.x, gameObject.transform.position.y, j);
                 var tile = TileInstantiate(pos);
