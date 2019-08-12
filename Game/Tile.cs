@@ -59,29 +59,66 @@ public class Tile: MonoBehaviour{
 		}
 	}
 
-	private void loadPrefabs(string forderName, string tag){
-		if (Resources.LoadAll("Tile/"+forderName) == null){Debug.Log("Err: "+forderName+"is null");return;}
-		Object[] prefabArr = Resources.LoadAll("Tile/"+forderName);
-		if (prefabArr.Length == 0) {Debug.Log(forderName + " has " + prefabArr.Length + " prefab");return;}
-		GameObject prefabObject = Instantiate(prefabArr[Random.Range(0,prefabArr.Length)],gameObject.transform.position,Quaternion.identity) as GameObject;
-		prefabObject.transform.parent = gameObject.transform;
-		gameObject.tag = tag;
+	public void BuildTower(TowerState state){
+		switch(state){
+            case TowerState.parabola:
+				loadPrefabs("Tile/Building/Wood/Wood_parabola_1", ConstData.building);
+				this.tileData.tileState = TileState.building;
+                break;
+            case TowerState.straight:
+                break;
+            case TowerState.scope:
+                break;
+        }
+	}
+
+	private void loadPrefabs(string path, string tag){
+		GameObject prefabObject;
 		BoxCollider colider;
 		if (gameObject.GetComponent<BoxCollider>() == null) {
 			colider = gameObject.AddComponent<BoxCollider>();
 		}
 		colider = gameObject.GetComponent<BoxCollider>();
-		if (tag != ConstData.normal){
+		if (tag == ConstData.material){
+			if (!loadAll(path)){return;}
+			prefabObject = loadAll(path);
 			hpText.transform.gameObject.SetActive(true);
 			colider.size = new Vector3(1,1.5f,1);
 			colider.center = new Vector3(0,0.5f,0);
 			prefabObject.transform.position = new Vector3(transform.position.x, -0.2f,transform.position.z);
-		}else{
+		}else if(tag == ConstData.normal){
+			if (!loadAll(path)){return;}
+			prefabObject = loadAll(path);
 			hpText.transform.gameObject.SetActive(false);
 			colider.size = Vector3.one;
 			colider.center = Vector3.zero;
+		}else if(tag == ConstData.building){
+			prefabObject = loadOne(path);
+			hpText.transform.gameObject.SetActive(true);
+			colider.size = new Vector3(1,1.5f,1);
+			colider.center = new Vector3(0,0.5f,0);
+			prefabObject.transform.position = new Vector3(transform.position.x, 0.0f,transform.position.z);
+		}else{
+			Debug.Log("Tag problem");
+			prefabObject = null;
 		}
+		prefabObject.transform.parent = gameObject.transform;
+		gameObject.tag = tag;
 		prefabObject.SetActive(true);
+	}
+
+	private GameObject loadAll(string forderName){
+		if (Resources.LoadAll("Tile/"+forderName) == null){Debug.Log("Err: "+forderName+"is null");return null;}
+		Object[] prefabArr = Resources.LoadAll("Tile/"+forderName);
+		if (prefabArr.Length == 0) {Debug.Log(forderName + " has " + prefabArr.Length + " prefab");return null;}
+		GameObject prefabObject = Instantiate(prefabArr[Random.Range(0,prefabArr.Length)],gameObject.transform.position,Quaternion.identity) as GameObject;
+		return prefabObject;
+	}
+	private GameObject loadOne(string path){
+		if(Resources.Load(path) == null) {Debug.Log("Err: "+path+"is null");return null;}
+		GameObject prefabObject = Instantiate(Resources.Load(path),gameObject.transform.position, Quaternion.identity) as GameObject;
+		prefabObject.transform.Rotate(0,-90f,0);
+		return prefabObject;
 	}
 }
 

@@ -24,7 +24,22 @@ public class UnitUI : MonoBehaviour
 
     [SerializeField]
     private Text unitHP;
+    [SerializeField]
+    private GameObject practicableArea;
+    [SerializeField]
+    private PiUIManager piUIManager;
 
+    #endregion
+
+    #region Private Field
+    private Vector3 buildUIPosition;
+    private PlayerScript player;
+    #endregion
+
+    #region Delegate
+    public delegate void TowerSelected(TowerState towerState);
+    private TowerSelected towerSelected = null;
+    
     #endregion
 
     #region MonoBehaviourCallBacks
@@ -45,6 +60,14 @@ public class UnitUI : MonoBehaviour
 
     #region Public Methods
 
+    public void UnitUIInit(PlayerScript player){
+        this.player = player;
+    }
+
+    public void SetCallbacks(TowerSelected towerSelected){
+        this.towerSelected = towerSelected;
+    }
+
     public void MaterialUIUpdate(PlayerData playerData)
     {
         woodText.text = "Wood: " + playerData.materialData.wood;
@@ -61,6 +84,53 @@ public class UnitUI : MonoBehaviour
         unitActiveCount.text = playerData.activeCount.ToString();
         unitHP.text = playerData.hp.ToString();
     }
+
+
+    // - Normal UI Button Func
+    public void BuildModeToggle(){
+        player.CheckAround();
+        practicableArea.SetActive(practicableArea.active ? false : true);
+    }
+
+    public void BuildUIActive(Vector3 clickPoint){
+        buildUIPosition = Camera.main.WorldToScreenPoint(clickPoint);
+		piUIManager.ChangeMenuState("NormalMenu",buildUIPosition);
+    }
+
+    public void BuildUIUnActive(){
+        if(piUIManager.PiOpened("NormalMenu"))
+            piUIManager.ChangeMenuState("NormalMenu");
+        if(piUIManager.PiOpened("TowerMenu"))
+            piUIManager.ChangeMenuState("TowerMenu");
+    }
+
+    public void TowerUITap(){
+        piUIManager.ChangeMenuState("NormalMenu");
+        piUIManager.ChangeMenuState("TowerMenu",buildUIPosition);
+    }
+
+    // - Tower button func 
+    public void TowerSelectButtonTap(string towerState){
+        TowerState state;
+        switch(towerState){
+            case "Parabola":
+                state = TowerState.parabola;
+                break;
+            case "Scope":
+                state = TowerState.scope;
+                break;
+            case "Straight":
+                state = TowerState.straight;
+                break;
+            default:
+                state = TowerState.none;
+                break;
+        }
+        towerSelected(state);
+        BuildUIUnActive();
+        BuildModeToggle();
+    }
+
 
     #endregion
 }
