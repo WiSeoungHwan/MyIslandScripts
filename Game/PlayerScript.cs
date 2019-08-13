@@ -21,7 +21,8 @@ public class PlayerScript : MonoBehaviour
 
     private bool isMine;
     private bool isEnemyBuildMode;
-    private int enemyCurrentBuilding;
+    private int enemyCurrentBuilding = 1;// 기본 포물선 타워 
+    
     #region Delegate
 
     public delegate void MaterialHit(MaterialState materialState, int num);
@@ -132,6 +133,8 @@ public class PlayerScript : MonoBehaviour
             EnemyInput();
         }
     }
+
+    
 
     private void Collect(Tile tile)
     {
@@ -263,8 +266,9 @@ public class PlayerScript : MonoBehaviour
     }
     private void BuildingEnemy(int inputIndex){
         if (playerIndex + inputIndex < 0 || playerIndex + inputIndex > 24) { return; }
-            if(moveCount() && enemyBuildTower()){
-                Tile tile = ground.tileArr[playerIndex + inputIndex];
+            Tile tile = ground.tileArr[playerIndex + inputIndex];
+        
+            if(tile.tileData.tileState == TileState.normal && enemyBuildTower()){
                 tile.BuildTower((TowerState)enemyCurrentBuilding);
                 this.BuildModeOff();
                 isEnemyBuildMode = false;

@@ -75,8 +75,10 @@ public class UnitManager : MonoBehaviour
     #region Private Methods
 
     private bool EnemyBuildTower(){
-        if (playerData.materialData.wood > 4) {
+        if (playerData.activeCount > 0 && playerData.materialData.wood > 4) {
             playerData.materialData.wood -= 5;
+            playerData.activeCount--;
+            unitUIController.UintUIUpdate(playerData);
             unitUIController.MaterialUIUpdate(playerData);
             return true;
         }else{

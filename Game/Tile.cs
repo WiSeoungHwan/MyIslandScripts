@@ -13,6 +13,8 @@ public class Tile: MonoBehaviour{
 	private Text hpText;
 
 	public TileData tileData;
+
+	private Tower tower = null;
 	void Start(){
 		// SetTilePrefab();
 		hpText.transform.position = hpTransform.position;
@@ -29,7 +31,7 @@ public class Tile: MonoBehaviour{
 	public void TileSetup(TileData tile){
 		// tile data 에 따라 프리펩 로드
 		// 우선 기반 타일 로드
-		this.tileData = tile;
+		this.tileData = tile; 
 		loadPrefabs(ConstData.normal, ConstData.normal);
 		switch (tile.tileState){
 			// 자원이나 건설물이 없을때
@@ -62,7 +64,9 @@ public class Tile: MonoBehaviour{
 	public void BuildTower(TowerState state){
 		switch(state){
             case TowerState.parabola:
-				loadPrefabs("Tile/Building/Wood/Wood_parabola_1", ConstData.building);
+				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
+				if(!loadPrefabs("Tile/Building/Wood/Wood_parabola_1", ConstData.building)){return;}
+				this.tower = loadPrefabs("Tile/Building/Wood/Wood_parabola_1", ConstData.building).AddComponent<Tower>();
 				this.tileData.tileState = TileState.building;
                 break;
             case TowerState.straight:
@@ -72,7 +76,7 @@ public class Tile: MonoBehaviour{
         }
 	}
 
-	private void loadPrefabs(string path, string tag){
+	private GameObject loadPrefabs(string path, string tag){
 		GameObject prefabObject;
 		BoxCollider colider;
 		if (gameObject.GetComponent<BoxCollider>() == null) {
@@ -80,14 +84,12 @@ public class Tile: MonoBehaviour{
 		}
 		colider = gameObject.GetComponent<BoxCollider>();
 		if (tag == ConstData.material){
-			if (!loadAll(path)){return;}
 			prefabObject = loadAll(path);
 			hpText.transform.gameObject.SetActive(true);
 			colider.size = new Vector3(1,1.5f,1);
 			colider.center = new Vector3(0,0.5f,0);
 			prefabObject.transform.position = new Vector3(transform.position.x, -0.2f,transform.position.z);
 		}else if(tag == ConstData.normal){
-			if (!loadAll(path)){return;}
 			prefabObject = loadAll(path);
 			hpText.transform.gameObject.SetActive(false);
 			colider.size = Vector3.one;
@@ -102,9 +104,11 @@ public class Tile: MonoBehaviour{
 			Debug.Log("Tag problem");
 			prefabObject = null;
 		}
+		
 		prefabObject.transform.parent = gameObject.transform;
 		gameObject.tag = tag;
 		prefabObject.SetActive(true);
+		return prefabObject;
 	}
 
 	private GameObject loadAll(string forderName){
@@ -117,7 +121,11 @@ public class Tile: MonoBehaviour{
 	private GameObject loadOne(string path){
 		if(Resources.Load(path) == null) {Debug.Log("Err: "+path+"is null");return null;}
 		GameObject prefabObject = Instantiate(Resources.Load(path),gameObject.transform.position, Quaternion.identity) as GameObject;
-		prefabObject.transform.Rotate(0,-90f,0);
+		if(tileData.isMine){
+			prefabObject.transform.Rotate(0,-90f,0);
+		}else{
+			prefabObject.transform.Rotate(0,90f,0);
+		}
 		return prefabObject;
 	}
 }

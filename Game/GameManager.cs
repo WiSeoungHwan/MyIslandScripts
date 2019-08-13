@@ -18,6 +18,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     private Text turnText;
     [SerializeField]
     private Text timeText;
+
     #endregion
 
     #region Private Field
@@ -44,9 +45,19 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
         StartCoroutine("OneSecTimer");
     }
+
+    
+
+    private void NotiTest(TileData tileData){
+        Debug.Log("NotiTest: " + tileData.isMine + tileData.index);
+    }
     #endregion
 
     #region Public Methods
+    
+    public Ground GetGroundData(bool isMine){
+        return isMine ? playerGround : enemyGround;
+    }
 
     IEnumerator OneSecTimer(){
         yield return new WaitForSeconds(1);
