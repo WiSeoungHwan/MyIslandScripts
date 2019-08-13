@@ -9,6 +9,7 @@ public class Tower : MonoBehaviour
     private TowerState state = TowerState.none;
     private int tileIndex;
     private bool isMine;
+    private Bullet bullet;
 
     #endregion
 
@@ -19,17 +20,27 @@ public class Tower : MonoBehaviour
         this.tileIndex = tileIndex;
         this.isMine = isMine;
     }
+
+    private void Fire(){
+        Targeting(tileIndex);
+        if(bullet){
+            bullet.Fire();
+        }
+    }
     #endregion
 
     #region Private Methods
 
     private void Targeting(int index){
-        Tile tile = GameManager.Instance.GetGroundData(isMine).tileArr[index];
+        Tile tile = GameManager.Instance.GetGroundData(isMine).tileArr[RandomNum(tileIndex)];
         CreateBullet(tile);
     }
 
     private void CreateBullet(Tile tile){
-        
+        GameObject ball = Instantiate(Resources.Load("CannonBall"),this.transform.position, Quaternion.identity) as GameObject;
+        ball.SetActive(true);
+        this.bullet = ball.AddComponent<Bullet>();
+        this.bullet.BulletInit(tile);
     }
 
     private int RandomNum(int num){

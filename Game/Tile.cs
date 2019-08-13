@@ -65,8 +65,8 @@ public class Tile: MonoBehaviour{
 		switch(state){
             case TowerState.parabola:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
-				if(!loadPrefabs("Tile/Building/Wood/Wood_parabola_1", ConstData.building)){return;}
 				this.tower = loadPrefabs("Tile/Building/Wood/Wood_parabola_1", ConstData.building).AddComponent<Tower>();
+				this.tower.TowerInit(state,tileData.index,tileData.isMine);
 				this.tileData.tileState = TileState.building;
                 break;
             case TowerState.straight:

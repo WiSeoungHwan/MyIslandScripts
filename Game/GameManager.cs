@@ -56,7 +56,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     #region Public Methods
     
     public Ground GetGroundData(bool isMine){
-        return isMine ? playerGround : enemyGround;
+        return isMine ? enemyGround : playerGround;
     }
 
     IEnumerator OneSecTimer(){
@@ -66,6 +66,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             currentTurn--;
             playerUnitManager.ResetPlayerActiveCount();
             enemyUnitManager.ResetPlayerActiveCount();
+            playerGround.BroadcastMessage("Fire",null,SendMessageOptions.DontRequireReceiver);
+            enemyGround.BroadcastMessage("Fire",null,SendMessageOptions.DontRequireReceiver);
             currentTime = ConstData.playTime;
         }
         this.timeText.text = "Time: "  + currentTime;
