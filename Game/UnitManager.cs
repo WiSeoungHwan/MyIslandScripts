@@ -40,6 +40,11 @@ public class UnitManager : MonoBehaviour
     #endregion
 
     #region Public Methods
+
+    public PlayerData GetPlayerData(){
+        this.playerData.playerIndex =  player.GetPlayerIndex();
+        return this.playerData;
+    }
     public void PlayerInit(Ground ground)
     {
         // Ground set up 
@@ -50,6 +55,7 @@ public class UnitManager : MonoBehaviour
         this.playerData.hp = ConstData.playerHp;
         this.playerData.activeCount = ConstData.activeCount;
         this.playerData.materialData = new MaterialData();
+        this.playerData.playerIndex = ConstData.playerInstanceIndex;
         unitUIController.UintUIUpdate(this.playerData);
 
         // Player Instance object
@@ -63,6 +69,12 @@ public class UnitManager : MonoBehaviour
         // Unit UI set up 
         unitUIController.UnitUIInit(this.player);
         unitUIController.SetCallbacks(TowerSelected);
+        unitUIController.UintUIUpdate(playerData);
+    }
+    IEnumerator OneSecTimer(){
+        yield return new WaitForSeconds(1);
+        
+        StartCoroutine("OneSecTimer");
     }
 
     public void ResetPlayerActiveCount()
@@ -70,6 +82,18 @@ public class UnitManager : MonoBehaviour
         playerData.activeCount = ConstData.activeCount;
         unitUIController.UintUIUpdate(this.playerData);
     }
+
+    public void UnitHit(int damage){
+        playerData.hp -= damage;
+        if (playerData.hp <= 0){
+            GameManager.Instance.GameOver();
+            Debug.Log("GameOver");
+        }
+        unitUIController.UintUIUpdate(this.playerData);
+        
+    }
+
+
     #endregion
 
     #region Private Methods
@@ -91,9 +115,11 @@ public class UnitManager : MonoBehaviour
         {
             // 카운트를 다 쓴 상황 
             unitUIController.UintUIUpdate(this.playerData);
+            playerData.playerIndex = player.GetPlayerIndex();
             return false;
         }
         playerData.activeCount--;
+        playerData.playerIndex = player.GetPlayerIndex();
         unitUIController.UintUIUpdate(this.playerData);
         return true;
     }

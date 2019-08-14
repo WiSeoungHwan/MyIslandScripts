@@ -11,6 +11,8 @@ public class Tile: MonoBehaviour{
 	public Transform hpTransform;
 	[SerializeField]
 	private Text hpText;
+	[SerializeField]
+	private GameObject tileTargeting;
 
 	public TileData tileData;
 
@@ -19,6 +21,10 @@ public class Tile: MonoBehaviour{
 		// SetTilePrefab();
 		hpText.transform.position = hpTransform.position;
 		hpText.rectTransform.Rotate(Vector3.forward);
+	}
+
+	public void TileTargeting(bool isTargeting){
+		tileTargeting.SetActive(isTargeting);
 	}
 
 	public void MaterialHit(int damage){

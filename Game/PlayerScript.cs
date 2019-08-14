@@ -46,6 +46,7 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(GameManager.Instance.isGameOver){return;}
         PlayerAction();
     }
 
@@ -275,6 +276,10 @@ public class PlayerScript : MonoBehaviour
             }
             
             
+    }
+
+    public int GetPlayerIndex(){
+        return playerIndex;
     }
 
     public void BuildModeOff()

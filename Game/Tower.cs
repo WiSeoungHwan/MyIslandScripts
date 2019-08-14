@@ -33,6 +33,7 @@ public class Tower : MonoBehaviour
 
     private void Targeting(int index){
         Tile tile = GameManager.Instance.GetGroundData(isMine).tileArr[RandomNum(tileIndex)];
+        tile.TileTargeting(true);
         CreateBullet(tile);
     }
 
@@ -67,14 +68,11 @@ public class Tower : MonoBehaviour
             numList.Add(num - 4);
             numList.Add(num + 4);
         }
-        Debug.Log(numList);
+        numList.Add(num);
         for(int i  = numList.Count - 1; i >= 0; i--){
             if(numList[i] > 24 || numList[i] < 0){
                 numList.RemoveAt(i);
             }
-        }
-        foreach(int i in numList){
-            Debug.Log(i);
         }
         var randomNum = Random.Range(0,numList.Count);
         return numList[randomNum];

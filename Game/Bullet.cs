@@ -19,7 +19,8 @@ public class Bullet : MonoBehaviour
 
     public void Fire(){
         throwSimulator.Shoot(this.transform,this.transform.position,destination.transform.position,10f,3f, ()=> {
-            Debug.Log("Sucess");
+            GameManager.Instance.SendMessage("IsPlayerHit", destination);
+            destination.TileTargeting(false);
             Destroy(gameObject);
             });
     }

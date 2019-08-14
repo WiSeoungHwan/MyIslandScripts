@@ -28,6 +28,10 @@ public class UnitUI : MonoBehaviour
     private GameObject practicableArea;
     [SerializeField]
     private PiUIManager piUIManager;
+    [SerializeField]
+    private Slider unitHpSlider;
+    [SerializeField]
+    private HealthBar activeCount;
 
     #endregion
 
@@ -83,6 +87,7 @@ public class UnitUI : MonoBehaviour
     public void UintUIUpdate(PlayerData playerData){
         unitActiveCount.text = playerData.activeCount.ToString();
         unitHP.text = playerData.hp.ToString();
+        unitHpSlider.value = playerData.hp;
     }
 
 
