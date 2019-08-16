@@ -7,6 +7,10 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 {
 
     #region SerializeField
+
+    [SerializeField]
+    TileSkinHandler tileSkinHandler;
+
     [SerializeField]
     private Ground playerGround;
     [SerializeField]

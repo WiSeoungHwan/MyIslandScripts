@@ -13,6 +13,8 @@ public class UnitManager : MonoBehaviour
     private UnitUI unitUIController;
     [SerializeField]
     private GameObject playerObject;
+    [SerializeField]
+    private HealthBar stamina;
 
     #endregion
     #region Private Field
@@ -70,17 +72,16 @@ public class UnitManager : MonoBehaviour
         unitUIController.UnitUIInit(this.player);
         unitUIController.SetCallbacks(TowerSelected);
         unitUIController.UintUIUpdate(playerData);
+
+        // Stamina Bar set up 
+        stamina.SetCallBacks(AddStamina);
     }
-    IEnumerator OneSecTimer(){
-        yield return new WaitForSeconds(1);
-        
-        StartCoroutine("OneSecTimer");
-    }
+
 
     public void ResetPlayerActiveCount()
     {
-        playerData.activeCount = ConstData.activeCount;
-        unitUIController.UintUIUpdate(this.playerData);
+        // playerData.activeCount = ConstData.activeCount;
+        // unitUIController.UintUIUpdate(this.playerData);
     }
 
     public void UnitHit(int damage){
@@ -98,10 +99,22 @@ public class UnitManager : MonoBehaviour
 
     #region Private Methods
 
+    private void AddStamina()
+    {
+        if(playerData.activeCount   >= 5)
+        {
+            playerData.activeCount = 5;
+            return;
+        }
+        playerData.activeCount++;
+        Debug.Log("activeCount: " + playerData.activeCount);
+    }
+
     private bool EnemyBuildTower(){
         if (playerData.activeCount > 0 && playerData.materialData.wood > 4) {
             playerData.materialData.wood -= 5;
             playerData.activeCount--;
+            stamina.Hurt(1);
             unitUIController.UintUIUpdate(playerData);
             unitUIController.MaterialUIUpdate(playerData);
             return true;
@@ -119,6 +132,7 @@ public class UnitManager : MonoBehaviour
             return false;
         }
         playerData.activeCount--;
+        stamina.Hurt(1);
         playerData.playerIndex = player.GetPlayerIndex();
         unitUIController.UintUIUpdate(this.playerData);
         return true;
@@ -156,6 +170,7 @@ public class UnitManager : MonoBehaviour
         if(!ground.tileArr[willBuildIndex]) {Debug.Log("ground[willBuildIndex] tile is null"); return;}
         if(playerData.materialData.wood > 4){
             playerData.activeCount -= 1;
+            stamina.Hurt(1);
             playerData.materialData.wood -= 5;
             unitUIController.MaterialUIUpdate(this.playerData);
             unitUIController.UintUIUpdate(this.playerData);

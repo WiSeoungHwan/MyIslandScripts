@@ -141,7 +141,7 @@ public class PlayerScript : MonoBehaviour
     {
         tile.MaterialHit(ConstData.materialDamage);
         materialHit(tile.tileData.materialState, ConstData.materialDamage);
-        CheckAround();
+        //CheckAround();
     }
     private void Move(Tile tile)
     {

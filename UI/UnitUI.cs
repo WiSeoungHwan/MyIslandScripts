@@ -30,8 +30,6 @@ public class UnitUI : MonoBehaviour
     private PiUIManager piUIManager;
     [SerializeField]
     private Slider unitHpSlider;
-    [SerializeField]
-    private HealthBar activeCount;
 
     #endregion
 
@@ -66,6 +64,7 @@ public class UnitUI : MonoBehaviour
 
     public void UnitUIInit(PlayerScript player){
         this.player = player;
+        
     }
 
     public void SetCallbacks(TowerSelected towerSelected){

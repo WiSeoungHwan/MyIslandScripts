@@ -55,6 +55,11 @@ public class HealthBar : MonoBehaviour
         }
     }
 
+    #region Delegate
+    public delegate void StaminaCount();
+    private StaminaCount staminaCount = null;
+    #endregion
+
     protected void Awake()
     {
         imageRectTransform = image.GetComponent<RectTransform>();
@@ -64,7 +69,6 @@ public class HealthBar : MonoBehaviour
         MaxHealthPoints = MaxHealthPoints; // Force the call to the setter in order to update the material
         currentHealthPoints = MaxHealthPoints; // Force the call to the setter in order to update the material
         StartCoroutine("OneSecTimer");
-
     }
 
     protected void Update()
@@ -73,24 +77,28 @@ public class HealthBar : MonoBehaviour
         {
             Damages += damagesDecreaseRate * Time.deltaTime;
         }
-
-        // Dummy test, you can remove this
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             Hurt(1);
-        }
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            Heal(1);
-        }
-    
     }
     IEnumerator OneSecTimer(){
         yield return new WaitForSeconds(1);
         if(Health < 5){
             Health += 1;
+            staminaCount();
             Damages = 0;
         }
+        StartCoroutine("OneSecTimer");
+    }
+
+    #region Public Method
+
+    public void SetCallBacks(StaminaCount staminaCount)
+    {
+        this.staminaCount = staminaCount;
+    }
+
+    public void HealHp()
+    {
         StartCoroutine("OneSecTimer");
     }
 
@@ -99,8 +107,12 @@ public class HealthBar : MonoBehaviour
         Damages = 0;
         Health -= damagesPoints;
     }
-    public void Heal(float healPoints){
+    public void Heal(float healPoints)
+    {
         Damages = healPoints;
         Health += Damages;
     }
+    #endregion
+
+
 }
