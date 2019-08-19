@@ -22,6 +22,7 @@ public class PlayerScript : MonoBehaviour
     private bool isMine;
     private bool isEnemyBuildMode;
     private int enemyCurrentBuilding = 1;// 기본 포물선 타워 
+    private TowerLevelHandler towerLevelHandler;
     
     #region Delegate
 
@@ -52,11 +53,12 @@ public class PlayerScript : MonoBehaviour
 
     // MARK: - Public Methods 
 
-    public void PlayerInit(Ground ground, bool isMine, int startIndex)
+    public void PlayerInit(Ground ground, bool isMine, int startIndex, TowerLevelHandler towerLevelHandler)
     {
         this.isMine = isMine;
         this.ground = ground;
         this.playerIndex = startIndex;
+        this.towerLevelHandler = towerLevelHandler;
     }
 
     public void SetCallBacks(MaterialHit materialHit, MoveCount moveCount, BuildingAreaTap buildingAreaTap, EnemyBuildTower enemyBuildTower)
@@ -270,7 +272,7 @@ public class PlayerScript : MonoBehaviour
             Tile tile = ground.tileArr[playerIndex + inputIndex];
         
             if(tile.tileData.tileState == TileState.normal && enemyBuildTower()){
-                tile.BuildTower((TowerState)enemyCurrentBuilding);
+                tile.BuildTower((TowerState)enemyCurrentBuilding, towerLevelHandler.GetTower(0));
                 this.BuildModeOff();
                 isEnemyBuildMode = false;
             }

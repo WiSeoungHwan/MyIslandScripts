@@ -10,6 +10,7 @@ public class Tower : MonoBehaviour
     private int tileIndex;
     private bool isMine;
     private Bullet bullet;
+    private Arrow arrow;
 
     #endregion
 
@@ -26,6 +27,7 @@ public class Tower : MonoBehaviour
         if(bullet){
             bullet.Fire();
         }
+        
     }
     #endregion
 
@@ -38,10 +40,24 @@ public class Tower : MonoBehaviour
     }
 
     private void CreateBullet(Tile tile){
-        GameObject ball = Instantiate(Resources.Load("CannonBall"),this.transform.position, Quaternion.identity) as GameObject;
-        ball.SetActive(true);
-        this.bullet = ball.AddComponent<Bullet>();
-        this.bullet.BulletInit(tile);
+        switch(state){
+            case TowerState.parabola:
+            GameObject ball = Instantiate(Resources.Load("CannonBall"),this.transform.position, Quaternion.identity) as GameObject;
+            ball.SetActive(true);
+            this.bullet = ball.AddComponent<Bullet>();
+            this.bullet.BulletInit(tile);
+            break;
+            case TowerState.straight:
+            GameObject arrow = Instantiate(Resources.Load("Arrow"), this.transform.position, Quaternion.identity) as GameObject;
+            arrow.SetActive(true);
+            this.arrow = arrow.GetComponent<Arrow>();
+            this.arrow.TargetSetup(tile);
+
+            break;
+            case TowerState.scope:
+            break;
+        }
+        
     }
 
     private int RandomNum(int num){

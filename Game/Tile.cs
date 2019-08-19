@@ -18,7 +18,6 @@ public class Tile: MonoBehaviour{
 
 	private Tower tower = null;
 	void Start(){
-		// SetTilePrefab();
 		hpText.transform.position = hpTransform.position;
 		hpText.rectTransform.Rotate(Vector3.forward);
 	}
@@ -34,11 +33,12 @@ public class Tile: MonoBehaviour{
 		}
 		hpText.text = this.tileData.hp.ToString();
 	}
-	public void TileSetup(TileData tile){
+	public void TileSetup(TileData tile, SkinData skinData){
 		// tile data 에 따라 프리펩 로드
 		// 우선 기반 타일 로드
-		this.tileData = tile; 
-		loadPrefabs(ConstData.normal, ConstData.normal);
+		this.tileData = tile;
+		TileLoad(skinData.ground, ConstData.normal);
+		// loadPrefabs(ConstData.normal, ConstData.normal);
 		switch (tile.tileState){
 			// 자원이나 건설물이 없을때
 			case TileState.normal:
@@ -51,7 +51,8 @@ public class Tile: MonoBehaviour{
 					case MaterialState.none:
 						break;
 					case MaterialState.wood:
-						loadPrefabs(ConstData.material + "/Wood", ConstData.material);
+						TileLoad(skinData.wood, ConstData.material);
+						// loadPrefabs(ConstData.material + "/Wood", ConstData.material);
 						break;
 					case MaterialState.stone:
 						break;
@@ -67,12 +68,14 @@ public class Tile: MonoBehaviour{
 		}
 	}
 
-	public void BuildTower(TowerState state){
+	public void BuildTower(TowerState state, GroundTile towerList){
 		switch(state){
             case TowerState.parabola:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
-				this.tower = loadPrefabs("Tile/Building/Wood/Wood_parabola_1", ConstData.building).AddComponent<Tower>();
+				this.tower = Instantiate(towerList[0], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
 				this.tower.TowerInit(state,tileData.index,tileData.isMine);
+				this.tower.transform.parent = transform;
+				this.tower.gameObject.SetActive(true);
 				this.tileData.tileState = TileState.building;
                 break;
             case TowerState.straight:
@@ -80,6 +83,50 @@ public class Tile: MonoBehaviour{
             case TowerState.scope:
                 break;
         }
+		if(tileData.isMine){
+			this.tower.transform.Rotate(0,0,0);
+		}else{
+			this.tower.transform.Rotate(0,180f,0);
+		}
+	}
+
+	private GameObject TileInstantiate(GroundTile groundTile){
+		GameObject tileObject = Instantiate(groundTile.data[Random.Range(0,groundTile.Length)], transform.position,Quaternion.identity);
+		tileObject.transform.parent = transform;
+		tileObject.SetActive(true);
+		return tileObject;
+	}
+
+	private GameObject TileLoad(GroundTile groundTile, string tag){
+		GameObject prefabObject;
+		BoxCollider colider;
+		if (gameObject.GetComponent<BoxCollider>() == null) {
+			colider = gameObject.AddComponent<BoxCollider>();
+		}
+		colider = gameObject.GetComponent<BoxCollider>();
+		if (tag == ConstData.material){
+			prefabObject = TileInstantiate(groundTile);
+			hpText.transform.gameObject.SetActive(true);
+			colider.size = new Vector3(1,1.5f,1);
+			colider.center = new Vector3(0,0.5f,0);
+			prefabObject.transform.position = new Vector3(transform.position.x, 0f,transform.position.z);
+		}else if(tag == ConstData.normal){
+			prefabObject = TileInstantiate(groundTile);
+			hpText.transform.gameObject.SetActive(false);
+			colider.size = Vector3.one;
+			colider.center = Vector3.zero;
+		}else if(tag == ConstData.building){
+			prefabObject = TileInstantiate(groundTile);
+			hpText.transform.gameObject.SetActive(true);
+			colider.size = new Vector3(1,1.5f,1);
+			colider.center = new Vector3(0,0.5f,0);
+			prefabObject.transform.position = new Vector3(transform.position.x, 0.0f,transform.position.z);
+		}else{
+			Debug.Log("Tag problem");
+			prefabObject = null;
+		}
+		gameObject.tag = tag;
+		return prefabObject;
 	}
 
 	private GameObject loadPrefabs(string path, string tag){

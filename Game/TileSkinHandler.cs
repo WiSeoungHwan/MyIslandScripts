@@ -31,12 +31,19 @@ public class TileSkinHandler : MonoBehaviour
 
     public SkinData GetSkinData(){
         var skinData = new SkinData();
-        
-        skinData.ground = groundTile[selectNum];
-        skinData.wood = materialWood[selectNum];
-        skinData.stone = materialStone[selectNum];
-        skinData.iron = materialIron[selectNum];
-        skinData.adam = materialAdam[selectNum];
+        if(groundTile.Length > selectNum)
+            skinData.ground = groundTile[selectNum];
+        //임시 
+        skinData.wood = materialWood[0];
+        skinData.stone = materialStone[0];
+        // if(materialWood.Length > selectNum)
+        //     skinData.wood = materialWood[selectNum];
+        // if(materialStone.Length > selectNum)
+        //     skinData.stone = materialStone[selectNum];
+        // if(materialIron.Length > selectNum)
+        //     skinData.iron = materialIron[selectNum];
+        // if(materialAdam.Length > selectNum)
+        //     skinData.adam = materialAdam[selectNum];
         return skinData;
     }
     #endregion 

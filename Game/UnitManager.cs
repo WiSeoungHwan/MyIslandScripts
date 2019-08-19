@@ -15,6 +15,7 @@ public class UnitManager : MonoBehaviour
     private GameObject playerObject;
     [SerializeField]
     private HealthBar stamina;
+    private TowerLevelHandler towerLevelHandler;
 
     #endregion
     #region Private Field
@@ -47,13 +48,16 @@ public class UnitManager : MonoBehaviour
         this.playerData.playerIndex =  player.GetPlayerIndex();
         return this.playerData;
     }
-    public void PlayerInit(Ground ground)
+    public void PlayerInit(Ground ground, TowerLevelHandler towerLevelHandler)
     {
+        // Tower level handler
+        this.towerLevelHandler = towerLevelHandler;
         // Ground set up 
         this.ground = ground;
 
         // Player Data set up 
         this.playerData = new PlayerData();
+        this.playerData.playerLevel = 0;
         this.playerData.hp = ConstData.playerHp;
         this.playerData.activeCount = ConstData.activeCount;
         this.playerData.materialData = new MaterialData();
@@ -65,7 +69,7 @@ public class UnitManager : MonoBehaviour
         playerObject.transform.SetParent(transform);
         playerObject.transform.position = pos;
         this.player = playerObject.GetComponent<PlayerScript>();
-        this.player.PlayerInit(ground, isMine, ConstData.playerInstanceIndex);
+        this.player.PlayerInit(ground, isMine, ConstData.playerInstanceIndex,towerLevelHandler);
         this.player.SetCallBacks(SetUnitMatrialUI, UnitMoveCount, BuildingAreaTap,EnemyBuildTower);
 
         // Unit UI set up 
@@ -175,7 +179,8 @@ public class UnitManager : MonoBehaviour
             unitUIController.MaterialUIUpdate(this.playerData);
             unitUIController.UintUIUpdate(this.playerData);
             Tile tile = ground.tileArr[willBuildIndex];
-            tile.BuildTower(state);
+            
+            tile.BuildTower(state,towerLevelHandler.GetTower(playerData.playerLevel));
         }else{
             Debug.Log("material is lack");
         }

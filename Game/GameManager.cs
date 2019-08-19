@@ -10,6 +10,8 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
     [SerializeField]
     TileSkinHandler tileSkinHandler;
+    [SerializeField]
+    TowerLevelHandler towerLevelHandler;
 
     [SerializeField]
     private Ground playerGround;
@@ -45,12 +47,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     #region Private Methods
     private void GameInit(){
         // Ground Init
-        playerGround.InitGround(true);
-        enemyGround.InitGround(false);
+        playerGround.InitGround(true, tileSkinHandler);
+        enemyGround.InitGround(false, tileSkinHandler);
         
         // Player Init
-        playerUnitManager.PlayerInit(playerGround);
-        enemyUnitManager.PlayerInit(enemyGround);
+        playerUnitManager.PlayerInit(playerGround, towerLevelHandler);
+        enemyUnitManager.PlayerInit(enemyGround, towerLevelHandler);
 
         StartCoroutine("OneSecTimer");
     }

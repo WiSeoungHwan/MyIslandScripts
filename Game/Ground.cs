@@ -8,6 +8,8 @@ public class Ground : MonoBehaviour
     public List<Tile> tileArr = new List<Tile>();
     public List<TileData> tileDatas = new List<TileData>();
 
+    private TileSkinHandler tileSkinHandler;
+
     // MARK: - MonoBehaviour CallBacks
     void Awake()
     {
@@ -32,8 +34,9 @@ public class Ground : MonoBehaviour
     // MARK: - Public Methods
 
 
-    public void InitGround(bool isMine)
+    public void InitGround(bool isMine, TileSkinHandler tileSkinHandler)
     {
+        this.tileSkinHandler = tileSkinHandler;
         tileDatas = GroundTileDataInit(isMine);
     }
 
@@ -42,6 +45,7 @@ public class Ground : MonoBehaviour
         var index = 0;
         // 초기에 주어지는 자원의 숫자 
         var materialInitNum = ConstData.materialInitNum;
+        var skinData = tileSkinHandler.GetSkinData();
         List<TileData> tileDatas = new List<TileData>();
         for (int i = 0; i < ConstData.mapSize; i++)
         {
@@ -86,8 +90,7 @@ public class Ground : MonoBehaviour
 					// 본게임: 어떤 자원인지 분기 처리 후 체력도 분기 처리 필요 
                     // 미구현
                 }
-				
-                tile.TileSetup(tileData);
+                tile.TileSetup(tileData,skinData);
 				tileArr.Add(tile);
                 tileDatas.Add(tileData);
                 index++;
