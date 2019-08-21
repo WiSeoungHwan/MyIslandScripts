@@ -79,6 +79,12 @@ public class Tile: MonoBehaviour{
 				this.tileData.tileState = TileState.building;
                 break;
             case TowerState.straight:
+				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
+				this.tower = Instantiate(towerList[1], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
+				this.tower.TowerInit(state,tileData.index,tileData.isMine);
+				this.tower.transform.parent = transform;
+				this.tower.gameObject.SetActive(true);
+				this.tileData.tileState = TileState.building;
                 break;
             case TowerState.scope:
                 break;
