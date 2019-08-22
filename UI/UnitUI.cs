@@ -8,6 +8,8 @@ public class UnitUI : MonoBehaviour
     #region SerializeField
 
     [SerializeField]
+    private Canvas unitCanvas;
+    [SerializeField]
     private Text woodText;
 
     [SerializeField]
@@ -19,8 +21,6 @@ public class UnitUI : MonoBehaviour
     [SerializeField]
     private Text adamantiumText;
 
-    [SerializeField]
-    private Text unitActiveCount;
 
     [SerializeField]
     private Text unitHP;
@@ -30,6 +30,8 @@ public class UnitUI : MonoBehaviour
     private PiUIManager piUIManager;
     [SerializeField]
     private Slider unitHpSlider;
+    [SerializeField]
+    private TextMove headPopup;
 
     #endregion
 
@@ -83,10 +85,14 @@ public class UnitUI : MonoBehaviour
 
     }
     
-    public void UintUIUpdate(PlayerData playerData){
-        unitActiveCount.text = playerData.activeCount.ToString();
+    public void UnitUIUpdate(PlayerData playerData){
         unitHP.text = playerData.hp.ToString();
         unitHpSlider.value = playerData.hp;
+    }
+    public void UnitHeadPopUpActive(string text){
+        TextMove instance = Instantiate(this.headPopup);
+        instance.transform.SetParent(unitCanvas.transform, false);
+        instance.SetText(text);
     }
 
 

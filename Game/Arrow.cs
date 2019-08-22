@@ -86,7 +86,6 @@ public class Arrow : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        Debug.Log(destination.tileData.isMine +"" + destination.transform.position.x * 1.5f * Time.deltaTime);
 
 
     }

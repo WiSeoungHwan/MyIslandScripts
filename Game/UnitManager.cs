@@ -62,7 +62,7 @@ public class UnitManager : MonoBehaviour
         this.playerData.activeCount = ConstData.activeCount;
         this.playerData.materialData = new MaterialData();
         this.playerData.playerIndex = ConstData.playerInstanceIndex;
-        unitUIController.UintUIUpdate(this.playerData);
+        unitUIController.UnitUIUpdate(this.playerData);
 
         // Player Instance object
         var pos = isMine ? new Vector3(2, 0, 2) : new Vector3(-5, 0, 2);
@@ -75,7 +75,7 @@ public class UnitManager : MonoBehaviour
         // Unit UI set up 
         unitUIController.UnitUIInit(this.player);
         unitUIController.SetCallbacks(TowerSelected);
-        unitUIController.UintUIUpdate(playerData);
+        unitUIController.UnitUIUpdate(playerData);
 
         // Stamina Bar set up 
         stamina.SetCallBacks(AddStamina);
@@ -90,11 +90,12 @@ public class UnitManager : MonoBehaviour
 
     public void UnitHit(int damage){
         playerData.hp -= damage;
+        unitUIController.UnitHeadPopUpActive("-"+damage);
         if (playerData.hp <= 0){
             GameManager.Instance.GameOver();
             Debug.Log("GameOver");
         }
-        unitUIController.UintUIUpdate(this.playerData);
+        unitUIController.UnitUIUpdate(this.playerData);
         
     }
 
@@ -119,7 +120,7 @@ public class UnitManager : MonoBehaviour
             playerData.materialData.wood -= 5;
             playerData.activeCount--;
             stamina.Hurt(1);
-            unitUIController.UintUIUpdate(playerData);
+            unitUIController.UnitUIUpdate(playerData);
             unitUIController.MaterialUIUpdate(playerData);
             return true;
         }else{
@@ -131,14 +132,14 @@ public class UnitManager : MonoBehaviour
         if (playerData.activeCount <= 0)
         {
             // 카운트를 다 쓴 상황 
-            unitUIController.UintUIUpdate(this.playerData);
+            unitUIController.UnitUIUpdate(this.playerData);
             playerData.playerIndex = player.GetPlayerIndex();
             return false;
         }
         playerData.activeCount--;
         stamina.Hurt(1);
         playerData.playerIndex = player.GetPlayerIndex();
-        unitUIController.UintUIUpdate(this.playerData);
+        unitUIController.UnitUIUpdate(this.playerData);
         return true;
     }
     private void BuildingAreaTap(Vector3 clickPoint, int willBuildIndex)
@@ -154,15 +155,19 @@ public class UnitManager : MonoBehaviour
         {
             case MaterialState.wood:
                 playerData.materialData.wood += num;
+                unitUIController.UnitHeadPopUpActive("나무 +"+num);
                 break;
             case MaterialState.stone:
                 playerData.materialData.stone += num;
+                unitUIController.UnitHeadPopUpActive("돌 +"+num);
                 break;
             case MaterialState.iron:
                 playerData.materialData.iron += num;
+                unitUIController.UnitHeadPopUpActive("철 +"+num);
                 break;
             case MaterialState.adamantium:
                 playerData.materialData.adamantium += num;
+                unitUIController.UnitHeadPopUpActive("아티움 +"+num);
                 break;
             default:
                 break;
@@ -176,8 +181,9 @@ public class UnitManager : MonoBehaviour
             playerData.activeCount -= 1;
             stamina.Hurt(1);
             playerData.materialData.wood -= 5;
+            unitUIController.UnitHeadPopUpActive("나무 -5");
             unitUIController.MaterialUIUpdate(this.playerData);
-            unitUIController.UintUIUpdate(this.playerData);
+            unitUIController.UnitUIUpdate(this.playerData);
             Tile tile = ground.tileArr[willBuildIndex];
             
             tile.BuildTower(state,towerLevelHandler.GetTower(playerData.playerLevel));
