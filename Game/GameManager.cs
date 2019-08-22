@@ -85,6 +85,39 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         }
     }
 
+    private void IsPlayerArrowHit(Tile tile){
+        if (tile.tileData.isMine){ // 적이 쏜거 - 내 타일 
+                var playerData = playerUnitManager.GetPlayerData();
+                var tileIndex = tile.tileData.index;
+                if((playerData.playerIndex == tileIndex) || (playerData.playerIndex == tileIndex + 1) || (playerData.playerIndex == tileIndex -1) || (playerData.playerIndex == tileIndex + 5) || (playerData.playerIndex == tileIndex - 5)){
+                    if(playerData.playerIndex % 5 == 0 && (tileIndex - 4) % 5 == 0){
+                        return;
+                    }
+                    if((playerData.playerIndex - 4) % 5 == 0 && tileIndex % 5 == 0){
+                        return;
+                    }
+                    playerUnitManager.UnitHit(1);
+                    Debug.Log("2P가 쏜 독에 1P가 맞았습니다.");
+                }
+                
+
+        }else{ // 내가 쏜거 - 적타일 
+                var playerData = enemyUnitManager.GetPlayerData();
+                var tileIndex = tile.tileData.index;
+                if((playerData.playerIndex == tileIndex) || (playerData.playerIndex == tileIndex + 1) || (playerData.playerIndex == tileIndex -1) || (playerData.playerIndex == tileIndex + 5) || (playerData.playerIndex == tileIndex - 5)){
+                    if(playerData.playerIndex % 5 == 0 && (tileIndex - 4) % 5 == 0){
+                        return;
+                    }
+                    if((playerData.playerIndex - 4) % 5 == 0 && tileIndex % 5 == 0){
+                        return;
+                    }
+                    enemyUnitManager.UnitHit(1);
+                    Debug.Log("1p가 쏜 독에 2P가 맞았습니다.");
+                }
+                
+        }
+    }
+
     
 
     private void NotiTest(TileData tileData){

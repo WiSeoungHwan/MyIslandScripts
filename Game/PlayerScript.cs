@@ -10,9 +10,13 @@ public class PlayerScript : MonoBehaviour
 
     [SerializeField]
     GameObject[] practicableAreas;
+    [SerializeField]
+    GameObject[] moveArea;
 
     [SerializeField]
     Material normalMaterial;
+    [SerializeField]
+    Material moveMaterial;
 
     private Ground ground;
 
@@ -59,6 +63,7 @@ public class PlayerScript : MonoBehaviour
         this.ground = ground;
         this.playerIndex = startIndex;
         this.towerLevelHandler = towerLevelHandler;
+        CheckAroundMove();
     }
 
     public void SetCallBacks(MaterialHit materialHit, MoveCount moveCount, BuildingAreaTap buildingAreaTap, EnemyBuildTower enemyBuildTower)
@@ -93,18 +98,22 @@ public class PlayerScript : MonoBehaviour
                         if (!tile.tileData.isMine) { return; } // 적의 타일을 클릭시 
                         if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
                         {
-                            if (!moveCount()) { return; }
+                            
                             switch (tile.tileData.tileState)
                             {
                                 case TileState.normal:
+                                    if (!moveCount()) { return; }
                                     Move(tile);
                                     break;
                                 case TileState.material:
+                                    if (!moveCount()) { return; }
                                     Collect(tile);
                                     break;
                                 case TileState.building:
+                                // 건물 눌렀을때
                                     break;
                             }
+                            CheckAroundMove();
                         }
                     }
                     else if (hitInfo.transform.tag == ConstData.practicableAreaTag)
@@ -189,7 +198,7 @@ public class PlayerScript : MonoBehaviour
             if (!isEnemyBuildMode)
             {
                 isEnemyBuildMode = true;
-                CheckAround();
+                // CheckAround();
             }
             else
             {
@@ -292,8 +301,65 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    public void CheckAroundMove(){
+        foreach (GameObject i in moveArea)
+        {
+            int aroundIndex = 0;
+            switch (i.transform.name)
+            {
+                case "X1":
+                    aroundIndex = playerIndex + 5;
+                    break;
+                case "X-1":
+                    aroundIndex = playerIndex - 5;
+                    break;
+                case "Z1":
+                    if (playerIndex == 4 || (playerIndex - 4) % 5 == 0)
+                    { // right side
+                        i.SetActive(false);
+                        continue;
+                    }
+                    aroundIndex = playerIndex + 1;
+                    break;
+                case "Z-1":
+                    if (playerIndex == 0 || playerIndex % 5 == 0)
+                    { // left side
+                        i.SetActive(false);
+                        continue;
+                    }
+                    aroundIndex = playerIndex - 1;
+                    break;
+                default:
+                    Debug.Log("Tile not found");
+                    break;
+            }
+            if (aroundIndex < 0 || aroundIndex > 24)
+            {  // start tile or end tile
+                i.SetActive(false);
+                continue;
+            }
 
-    public void CheckAround()
+            if (ground.tileArr[aroundIndex] == null) { continue; }
+            Tile tile = ground.tileArr[aroundIndex];
+            switch (tile.tileData.tileState)
+            {
+                case TileState.normal:
+                    i.SetActive(true);
+                    i.GetComponent<MeshRenderer>().material = moveMaterial;
+                    break;
+                case TileState.material:
+                    i.SetActive(true);
+                    i.GetComponent<MeshRenderer>().material.color = Color.green;
+                    break;
+                case TileState.building:
+                    i.SetActive(false);
+                    break;
+            }
+        }
+    }
+
+
+    public void CheckAround(GameObject willBuild)
     {
         foreach (GameObject i in practicableAreas)
         {
@@ -337,14 +403,32 @@ public class PlayerScript : MonoBehaviour
             switch (tile.tileData.tileState)
             {
                 case TileState.normal:
+                    for(int j = 0; j < i.transform.childCount; j++){
+                        if(i.transform.GetChild(j)){
+                            Destroy(i.transform.GetChild(j).gameObject);
+                        }
+                    }
                     i.SetActive(true);
+                    var instance = Instantiate(willBuild, i.transform.position, Quaternion.identity);
+                    instance.transform.parent = i.transform;
+                    instance.SetActive(true);
                     i.GetComponent<MeshRenderer>().material = normalMaterial;
                     break;
                 case TileState.material:
+                    for(int j = 0; j < i.transform.childCount; j++){
+                        if(i.transform.GetChild(j)){
+                            Destroy(i.transform.GetChild(j).gameObject);
+                        }
+                    }
                     i.SetActive(true);
                     i.GetComponent<MeshRenderer>().material.color = Color.red;
                     break;
                 case TileState.building:
+                    for(int j = 0; j < i.transform.childCount; j++){
+                        if(i.transform.GetChild(j)){
+                            Destroy(i.transform.GetChild(j).gameObject);
+                        }
+                    }
                     i.SetActive(false);
                     break;
             }

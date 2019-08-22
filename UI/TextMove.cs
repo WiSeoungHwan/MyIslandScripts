@@ -16,7 +16,8 @@ public class TextMove : MonoBehaviour
     }
 
 
-    public void SetText(string text){
+    public void SetText(string text,Color color){
+        damageText.color = color;
         damageText.text = text;
     }
 }

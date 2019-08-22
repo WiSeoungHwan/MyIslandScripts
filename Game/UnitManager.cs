@@ -73,7 +73,7 @@ public class UnitManager : MonoBehaviour
         this.player.SetCallBacks(SetUnitMatrialUI, UnitMoveCount, BuildingAreaTap,EnemyBuildTower);
 
         // Unit UI set up 
-        unitUIController.UnitUIInit(this.player);
+        unitUIController.UnitUIInit(this.player,this.towerLevelHandler);
         unitUIController.SetCallbacks(TowerSelected);
         unitUIController.UnitUIUpdate(playerData);
 
@@ -90,7 +90,7 @@ public class UnitManager : MonoBehaviour
 
     public void UnitHit(int damage){
         playerData.hp -= damage;
-        unitUIController.UnitHeadPopUpActive("-"+damage);
+        unitUIController.UnitHeadPopUpActive("-"+damage, Color.red);
         if (playerData.hp <= 0){
             GameManager.Instance.GameOver();
             Debug.Log("GameOver");
@@ -145,7 +145,8 @@ public class UnitManager : MonoBehaviour
     private void BuildingAreaTap(Vector3 clickPoint, int willBuildIndex)
     {
         this.willBuildIndex = willBuildIndex;
-        unitUIController.BuildUIActive(clickPoint);
+        TowerSelected(unitUIController.state);
+        unitUIController.BuildModeOff();
     }
 
     private void SetUnitMatrialUI(MaterialState materialKind, int num)
@@ -155,19 +156,19 @@ public class UnitManager : MonoBehaviour
         {
             case MaterialState.wood:
                 playerData.materialData.wood += num;
-                unitUIController.UnitHeadPopUpActive("나무 +"+num);
+                unitUIController.UnitHeadPopUpActive("나무 +"+num, Color.green);
                 break;
             case MaterialState.stone:
                 playerData.materialData.stone += num;
-                unitUIController.UnitHeadPopUpActive("돌 +"+num);
+                unitUIController.UnitHeadPopUpActive("돌 +"+num, Color.green);
                 break;
             case MaterialState.iron:
                 playerData.materialData.iron += num;
-                unitUIController.UnitHeadPopUpActive("철 +"+num);
+                unitUIController.UnitHeadPopUpActive("철 +"+num, Color.green);
                 break;
             case MaterialState.adamantium:
                 playerData.materialData.adamantium += num;
-                unitUIController.UnitHeadPopUpActive("아티움 +"+num);
+                unitUIController.UnitHeadPopUpActive("아티움 +"+num, Color.green);
                 break;
             default:
                 break;
@@ -181,12 +182,13 @@ public class UnitManager : MonoBehaviour
             playerData.activeCount -= 1;
             stamina.Hurt(1);
             playerData.materialData.wood -= 5;
-            unitUIController.UnitHeadPopUpActive("나무 -5");
+            unitUIController.UnitHeadPopUpActive("나무 -5", Color.red);
             unitUIController.MaterialUIUpdate(this.playerData);
             unitUIController.UnitUIUpdate(this.playerData);
             Tile tile = ground.tileArr[willBuildIndex];
             
             tile.BuildTower(state,towerLevelHandler.GetTower(playerData.playerLevel));
+            player.CheckAroundMove();
         }else{
             Debug.Log("material is lack");
         }

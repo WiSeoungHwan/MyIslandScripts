@@ -57,8 +57,6 @@ public class Arrow : MonoBehaviour
 
     private void Shoot()
     {
-        
-
         if (destination.tileData.isMine)
         {
             transform.Translate(new Vector3(destination.transform.position.x * 2f * Time.deltaTime, 0f, 0f) , Space.World);
@@ -86,8 +84,6 @@ public class Arrow : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-
-
     }
 
     #endregion

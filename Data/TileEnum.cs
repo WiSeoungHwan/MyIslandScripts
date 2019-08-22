@@ -48,5 +48,7 @@ public enum TowerState
     none,
     parabola,
     straight,
-    scope
+    scope,
+    table,
+    bunker
 }

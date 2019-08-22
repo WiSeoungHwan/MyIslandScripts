@@ -32,6 +32,7 @@ public class UnitUI : MonoBehaviour
     private Slider unitHpSlider;
     [SerializeField]
     private TextMove headPopup;
+    private TowerLevelHandler towerLevelHandler;
 
     #endregion
 
@@ -45,6 +46,8 @@ public class UnitUI : MonoBehaviour
     private TowerSelected towerSelected = null;
     
     #endregion
+
+    public TowerState state;
 
     #region MonoBehaviourCallBacks
 
@@ -64,9 +67,9 @@ public class UnitUI : MonoBehaviour
 
     #region Public Methods
 
-    public void UnitUIInit(PlayerScript player){
+    public void UnitUIInit(PlayerScript player, TowerLevelHandler towerLevelHandler){
         this.player = player;
-        
+        this.towerLevelHandler = towerLevelHandler;
     }
 
     public void SetCallbacks(TowerSelected towerSelected){
@@ -89,37 +92,70 @@ public class UnitUI : MonoBehaviour
         unitHP.text = playerData.hp.ToString();
         unitHpSlider.value = playerData.hp;
     }
-    public void UnitHeadPopUpActive(string text){
+    public void UnitHeadPopUpActive(string text, Color color){
         TextMove instance = Instantiate(this.headPopup);
         instance.transform.SetParent(unitCanvas.transform, false);
-        instance.SetText(text);
+        instance.SetText(text, color);
     }
 
 
     // - Normal UI Button Func
-    public void BuildModeToggle(){
-        player.CheckAround();
+    public void BuildModeToggle(string towerState){
+        // TODO: - tower 레벨별 상황 분기하기 (현재는 우선 플레이어 레벨 1 상황)
+        GameObject tower = towerLevelHandler.GetTower(0).data[0];
+
+       
+        switch(towerState){
+            case "Parabola":
+                state = TowerState.parabola;
+                tower = towerLevelHandler.GetTower(0).data[0];
+                break;
+            case "Scope":
+                state = TowerState.scope;
+                tower = towerLevelHandler.GetTower(0).data[2];
+                break;
+            case "Straight":
+                state = TowerState.straight;
+                tower = towerLevelHandler.GetTower(0).data[1];
+                break;
+            case "Table":
+                state = TowerState.table;
+                break;
+            case "Bunker":
+                state = TowerState.bunker;
+                break;
+            default:
+                state = TowerState.none;
+                break;
+        }
+        player.CheckAround(tower);
         practicableArea.SetActive(practicableArea.active ? false : true);
     }
-
-    public void BuildUIActive(Vector3 clickPoint){
-        buildUIPosition = Camera.main.WorldToScreenPoint(clickPoint);
-		piUIManager.ChangeMenuState("NormalMenu",buildUIPosition);
+    public void BuildModeOff(){
+        practicableArea.SetActive(false);
     }
 
-    public void BuildUIUnActive(){
-        if(piUIManager.PiOpened("NormalMenu"))
-            piUIManager.ChangeMenuState("NormalMenu");
-        if(piUIManager.PiOpened("TowerMenu"))
-            piUIManager.ChangeMenuState("TowerMenu");
-    }
 
-    public void TowerUITap(){
-        piUIManager.ChangeMenuState("NormalMenu");
-        piUIManager.ChangeMenuState("TowerMenu",buildUIPosition);
-    }
+    // public void BuildUIActive(Vector3 clickPoint){
+    //     buildUIPosition = Camera.main.WorldToScreenPoint(clickPoint);
+	// 	piUIManager.ChangeMenuState("NormalMenu",buildUIPosition);
+    // }
+
+    // public void BuildUIUnActive(){
+    //     if(piUIManager.PiOpened("NormalMenu"))
+    //         piUIManager.ChangeMenuState("NormalMenu");
+    //     if(piUIManager.PiOpened("TowerMenu"))
+    //         piUIManager.ChangeMenuState("TowerMenu");
+    // }
+
+    // public void TowerUITap(){
+    //     piUIManager.ChangeMenuState("NormalMenu");
+    //     piUIManager.ChangeMenuState("TowerMenu",buildUIPosition);
+    // }
 
     // - Tower button func 
+
+    
     public void TowerSelectButtonTap(string towerState){
         TowerState state;
         switch(towerState){
@@ -132,13 +168,17 @@ public class UnitUI : MonoBehaviour
             case "Straight":
                 state = TowerState.straight;
                 break;
+            case "Table":
+                state = TowerState.table;
+                break;
+            case "Bunker":
+                state = TowerState.bunker;
+                break;
             default:
                 state = TowerState.none;
                 break;
         }
-        towerSelected(state);
-        BuildUIUnActive();
-        BuildModeToggle();
+        // towerSelected(state);
     }
 
 

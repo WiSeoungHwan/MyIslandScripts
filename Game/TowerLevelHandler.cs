@@ -5,7 +5,10 @@ using UnityEngine;
 public class TowerLevelHandler : MonoBehaviour
 {
     #region SerializeField
-
+    [SerializeField]
+    GroundTile table;
+    [SerializeField]
+    GroundTile bunker;
     [SerializeField]
     GroundTile woodTower;
     [SerializeField]
