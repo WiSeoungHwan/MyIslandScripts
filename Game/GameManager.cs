@@ -85,7 +85,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         }
     }
 
-    private void IsPlayerArrowHit(Tile tile){
+    private void IsPlayerScopeHit(Tile tile){
         if (tile.tileData.isMine){ // 적이 쏜거 - 내 타일 
                 var playerData = playerUnitManager.GetPlayerData();
                 var tileIndex = tile.tileData.index;

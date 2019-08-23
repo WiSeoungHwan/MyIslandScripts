@@ -8,6 +8,7 @@ public class Scope : MonoBehaviour
     private Tile destination;
     private ThrowSimulator throwSimulator;
     private List<Tile> scope = new List<Tile>();
+    private int demageTime = 0;
 
     #endregion
 
@@ -17,13 +18,34 @@ public class Scope : MonoBehaviour
         this.destination = destination;
         this.scope = scope;
         this.throwSimulator = gameObject.AddComponent<ThrowSimulator>();
+        foreach(var i in scope){
+            i.TileTargeting(true);
+        }
     }
 
     public void Fire(){
-        throwSimulator.Shoot(this.transform,this.transform.position,destination.transform.position,10f,3f, ()=> {
+        throwSimulator.Shoot(this.transform,this.transform.position,destination.transform.position,10f,5f, ()=> {
             GameManager.Instance.SendMessage("IsPlayerScopeHit", destination);
-            Destroy(gameObject);
+                StartCoroutine("OneSecTimer");
             });
+    }
+
+    IEnumerator OneSecTimer(){
+        yield return new WaitForSeconds(1);
+        demageTime++;
+        foreach(var i in scope){
+            i.TileTargeting(true);
+        }
+        GameManager.Instance.SendMessage("IsPlayerScopeHit", destination);
+        
+        if(demageTime > 2){
+            foreach(var i in scope){
+                i.TileTargeting(false);
+            }
+            Destroy(gameObject);
+            yield return null;
+        }
+        StartCoroutine("OneSecTimer");
     }
     #endregion
 }

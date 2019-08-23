@@ -35,6 +35,10 @@ public class Tower : MonoBehaviour
         {
             arrow.Fire();
         }
+        if (scope)
+        {
+            scope.Fire();
+        }
 
     }
     #endregion
@@ -71,7 +75,7 @@ public class Tower : MonoBehaviour
                 this.bullet.BulletInit(tile);
                 break;
             case TowerState.straight:
-                GameObject arrow = Instantiate(Resources.Load("Arrow"), new Vector3(this.transform.position.x,0.5f,this.transform.position.z), Quaternion.identity) as GameObject;
+                GameObject arrow = Instantiate(Resources.Load("Arrow"), new Vector3(this.transform.position.x, 0.5f, this.transform.position.z), Quaternion.identity) as GameObject;
                 arrow.SetActive(true);
                 this.arrow = arrow.GetComponent<Arrow>();
                 if (isMine)
@@ -86,9 +90,12 @@ public class Tower : MonoBehaviour
                 for (int i = 0; i < 5; ++i)
                 {
                     Tile route;
-                    if(isMine){
+                    if (isMine)
+                    {
                         route = GameManager.Instance.GetGroundData(isMine).tileArr[tile.tileData.index + 5 * i];
-                    }else{
+                    }
+                    else
+                    {
                         route = GameManager.Instance.GetGroundData(isMine).tileArr[(tileIndex % 5) + 5 * i];
                     }
                     route.TileTargeting(true);
@@ -97,7 +104,7 @@ public class Tower : MonoBehaviour
                 this.arrow.TargetSetup(tile, routes);
                 break;
             case TowerState.scope:
-                GameObject scope = Instantiate(Resources.Load("Scope"), new Vector3(this.transform.position.x,0.5f,this.transform.position.z), Quaternion.identity) as GameObject;
+                GameObject scope = Instantiate(Resources.Load("Scope"), new Vector3(this.transform.position.x, 0.5f, this.transform.position.z), Quaternion.identity) as GameObject;
                 scope.SetActive(true);
                 this.scope = scope.AddComponent<Scope>();
                 if (isMine)
@@ -108,8 +115,34 @@ public class Tower : MonoBehaviour
                 {
                     this.scope.transform.Rotate(0, -90f, 0);
                 }
+                int destinationIndex = tile.tileData.index;
+                List<int> scopeIndex = new List<int>();
+
+                var ground = GameManager.Instance.GetGroundData(isMine);
+
+                scopeIndex.Add(destinationIndex);
+                scopeIndex.Add(destinationIndex + 1);
+                scopeIndex.Add(destinationIndex - 1);
+                scopeIndex.Add(destinationIndex + 5);
+                scopeIndex.Add(destinationIndex - 5);
+                if(destinationIndex == 4 || ((destinationIndex - 4) % 5) == 0){
+                    scopeIndex.Remove(destinationIndex + 1);
+                }
+                if(destinationIndex == 0 || destinationIndex % 5 == 0){
+                    scopeIndex.Remove(destinationIndex - 1);
+                }
+                if(destinationIndex + 5 > 24){
+                    scopeIndex.Remove(destinationIndex + 5);
+                }
+                if(destinationIndex - 5 < 0){
+                    scopeIndex.Remove(destinationIndex - 5);
+                }
+
                 List<Tile> scopes = new List<Tile>();
-                //TODO: - Scope 범위 타일 지정 
+                foreach(var i in scopeIndex){
+                    scopes.Add(ground.tileArr[i]);
+                }
+                
                 this.scope.ScopeInit(tile, scopes);
 
                 break;
