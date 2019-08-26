@@ -23,7 +23,6 @@ public class UnitManager : MonoBehaviour
     private PlayerData playerData;
     private Ground ground;
     private int willBuildIndex;
-
     // Start is called before the first frame update
     #endregion
 
@@ -186,8 +185,14 @@ public class UnitManager : MonoBehaviour
             unitUIController.MaterialUIUpdate(this.playerData);
             unitUIController.UnitUIUpdate(this.playerData);
             Tile tile = ground.tileArr[willBuildIndex];
+            if(state == TowerState.table){
+                tile.BuildTower(state, towerLevelHandler.GetTable(0));
+                playerData.playerLevel = 0;
+                playerData.tableCount += 1;
+            }else{
+                tile.BuildTower(state,towerLevelHandler.GetTower(playerData.playerLevel));
+            }
             
-            tile.BuildTower(state,towerLevelHandler.GetTower(playerData.playerLevel));
             player.CheckAroundMove();
         }else{
             unitUIController.UnitHeadPopUpActive("자원 없음!",Color.red);

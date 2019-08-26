@@ -118,6 +118,20 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         }
     }
 
+    private void TableDestoried(bool isMine){
+        if(isMine){
+            playerUnitManager.GetPlayerData().tableCount -= 1;
+            if(playerUnitManager.GetPlayerData().tableCount < 0){
+                playerUnitManager.GetPlayerData().tableCount = 0;
+            }
+        }else{
+            enemyUnitManager.GetPlayerData().tableCount -= 1;
+            if(enemyUnitManager.GetPlayerData().tableCount < 0){
+                enemyUnitManager.GetPlayerData().tableCount = 0;
+            }
+        }
+    }
+
     
 
     private void NotiTest(TileData tileData){

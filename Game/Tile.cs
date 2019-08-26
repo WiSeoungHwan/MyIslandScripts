@@ -22,7 +22,7 @@ public class Tile: MonoBehaviour{
 
 	public TileData tileData;
 
-	private Tower tower = null;
+	private GameObject tower = null;
 	void Start(){
 		hpText.transform.position = hpTransform.position;
 		hpText.text = tileData.hp.ToString();
@@ -85,7 +85,11 @@ public class Tile: MonoBehaviour{
 		if(this.tileData.hp <= 0){
 			
 			if(transform.childCount < 6){
+				if(tileData.towerState == TowerState.table){
+					GameManager.Instance.SendMessage("TableDestoried", tileData.isMine);
+				}
 				Destroy(this.transform.GetChild(4).gameObject);
+				
 			}
 			this.hpText.gameObject.SetActive(false);
 			this.tileData.hp = 10;
@@ -103,29 +107,55 @@ public class Tile: MonoBehaviour{
 		switch(state){
             case TowerState.parabola:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
-				this.tower = Instantiate(towerList[0], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
-				this.tower.TowerInit(state,tileData.index,tileData.isMine,effects);
-				this.tower.transform.parent = transform;
-				this.tower.gameObject.SetActive(true);
+				this.tower = Instantiate(towerList[0], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity);
+				var towerComponent = this.tower.AddComponent<Tower>();
+				towerComponent.TowerInit(state,tileData.index,tileData.isMine,effects);
+				towerComponent.transform.parent = transform;
+				towerComponent.gameObject.SetActive(true);
 				this.tileData.tileState = TileState.building;
                 this.tag = ConstData.building;
                 break;
             case TowerState.straight:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
-				this.tower = Instantiate(towerList[1], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
-				this.tower.TowerInit(state,tileData.index,tileData.isMine, effects);
-				this.tower.transform.parent = transform;
-				this.tower.gameObject.SetActive(true);
+				this.tower = Instantiate(towerList[1], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity);
+				towerComponent = this.tower.AddComponent<Tower>();
+				towerComponent.TowerInit(state,tileData.index,tileData.isMine,effects);
+				towerComponent.transform.parent = transform;
+				towerComponent.gameObject.SetActive(true);
 				this.tileData.tileState = TileState.building;
                 this.tag = ConstData.building;
                 break;
             case TowerState.scope:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
-				this.tower = Instantiate(towerList[2], new Vector3(transform.position.x,0f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
-				this.tower.TowerInit(state,tileData.index,tileData.isMine, effects);
+				this.tower = Instantiate(towerList[2], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity);
+				towerComponent = this.tower.AddComponent<Tower>();
+				towerComponent.TowerInit(state,tileData.index,tileData.isMine,effects);
+				towerComponent.transform.parent = transform;
+				towerComponent.gameObject.SetActive(true);
+				this.tileData.tileState = TileState.building;
+                this.tag = ConstData.building;
+                break;
+        }
+		hpText.transform.gameObject.SetActive(true);
+		BoxCollider colider = gameObject.GetComponent<BoxCollider>();
+		colider.size = new Vector3(1,1.5f,1);
+		colider.center = new Vector3(0,0.5f,0);
+		if(tileData.isMine){
+			this.tower.transform.Rotate(0,0,0);
+		}else{
+			this.tower.transform.Rotate(0,180f,0);
+		}
+	}
+	public void BuildTower(TowerState state, GameObject tower){
+		
+		switch(state){
+            case TowerState.table:
+				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
+				this.tower = Instantiate(tower, new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity);
 				this.tower.transform.parent = transform;
 				this.tower.gameObject.SetActive(true);
 				this.tileData.tileState = TileState.building;
+				this.tileData.towerState = TowerState.table;
                 this.tag = ConstData.building;
                 break;
         }

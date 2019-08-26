@@ -6,7 +6,7 @@ public class TowerLevelHandler : MonoBehaviour
 {
     #region SerializeField
     [SerializeField]
-    GroundTile table;
+    List<GameObject> table = new List<GameObject>();
     [SerializeField]
     GroundTile bunker;
     [SerializeField]
@@ -34,6 +34,21 @@ public class TowerLevelHandler : MonoBehaviour
                 return adamTower;
             default:
             return woodTower;
+        }
+    }
+
+    public GameObject GetTable(int level){
+        switch (level){
+            case 0:
+                return table[0];
+            case 1:
+                return table[1];
+            case 2:
+                return table[2];
+            case 3:
+                return table[3];
+            default:
+            return table[0];
         }
     }
 

@@ -32,6 +32,8 @@ public class UnitUI : MonoBehaviour
     private Slider unitHpSlider;
     [SerializeField]
     private TextMove headPopup;
+    [SerializeField]
+    private GameObject towerUnActivePanel;
     private TowerLevelHandler towerLevelHandler;
 
     #endregion
@@ -91,6 +93,11 @@ public class UnitUI : MonoBehaviour
     public void UnitUIUpdate(PlayerData playerData){
         unitHP.text = playerData.hp.ToString();
         unitHpSlider.value = playerData.hp;
+        if(playerData.tableCount > 0){
+            towerUnActivePanel.SetActive(false);
+        }else{
+            towerUnActivePanel.SetActive(true);
+        }
     }
     public void UnitHeadPopUpActive(string text, Color color){
         TextMove instance = Instantiate(this.headPopup);
@@ -120,6 +127,7 @@ public class UnitUI : MonoBehaviour
                 break;
             case "Table":
                 state = TowerState.table;
+                tower = towerLevelHandler.GetTable(0);
                 break;
             case "Bunker":
                 state = TowerState.bunker;
