@@ -78,13 +78,13 @@ public class UnitUI : MonoBehaviour
 
     public void MaterialUIUpdate(PlayerData playerData)
     {
-        woodText.text = "Wood: " + playerData.materialData.wood;
+        woodText.text = "W " + playerData.materialData.wood;
 
-        stoneText.text = "Stone: " + playerData.materialData.stone;
+        stoneText.text = "S " + playerData.materialData.stone;
 
-        ironText.text = "Iron: " + playerData.materialData.iron;
+        ironText.text = "I  " + playerData.materialData.iron;
 
-        adamantiumText.text = "Adam: " + playerData.materialData.adamantium;
+        adamantiumText.text = "A " + playerData.materialData.adamantium;
 
     }
     
@@ -103,7 +103,7 @@ public class UnitUI : MonoBehaviour
     public void BuildModeToggle(string towerState){
         // TODO: - tower 레벨별 상황 분기하기 (현재는 우선 플레이어 레벨 1 상황)
         GameObject tower = towerLevelHandler.GetTower(0).data[0];
-
+        
        
         switch(towerState){
             case "Parabola":

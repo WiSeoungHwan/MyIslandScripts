@@ -10,12 +10,15 @@ public class Scope : MonoBehaviour
     private List<Tile> scope = new List<Tile>();
     private int demageTime = 0;
 
+    private GameObject effect;
+
     #endregion
 
     #region Public Field
 
-    public void ScopeInit(Tile destination, List<Tile> scope){
+    public void ScopeInit(Tile destination, List<Tile> scope, GameObject effect){
         this.destination = destination;
+        this.effect = effect;
         this.scope = scope;
         this.throwSimulator = gameObject.AddComponent<ThrowSimulator>();
         foreach(var i in scope){
@@ -25,6 +28,8 @@ public class Scope : MonoBehaviour
 
     public void Fire(){
         throwSimulator.Shoot(this.transform,this.transform.position,destination.transform.position,10f,5f, ()=> {
+            var effectObject = Instantiate(effect,destination.transform.position, Quaternion.identity);
+            effectObject.SetActive(true);
             GameManager.Instance.SendMessage("IsPlayerScopeHit", destination);
                 StartCoroutine("OneSecTimer");
             });
@@ -34,6 +39,9 @@ public class Scope : MonoBehaviour
         yield return new WaitForSeconds(1);
         demageTime++;
         foreach(var i in scope){
+            if(i.tileData.tileState == TileState.building){
+                i.TileHit(1);
+            }
             i.TileTargeting(true);
         }
         GameManager.Instance.SendMessage("IsPlayerScopeHit", destination);

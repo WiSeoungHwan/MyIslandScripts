@@ -190,7 +190,7 @@ public class UnitManager : MonoBehaviour
             tile.BuildTower(state,towerLevelHandler.GetTower(playerData.playerLevel));
             player.CheckAroundMove();
         }else{
-            Debug.Log("material is lack");
+            unitUIController.UnitHeadPopUpActive("자원 없음!",Color.red);
         }
         
     }

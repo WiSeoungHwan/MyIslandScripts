@@ -8,7 +8,7 @@ public class Arrow : MonoBehaviour
     private Tile destination;
     private List<Tile> routes = new List<Tile>();
     private bool isShoot;
-
+    private GameObject effect;
     #endregion
 
     #region Collider
@@ -22,6 +22,13 @@ public class Arrow : MonoBehaviour
                 if (playerLocation.x >= 0)
                 {
                     GameManager.Instance.SendMessage("IsPlayerArrowHit", true);
+                    var effectObject = Instantiate(effect, transform.position, Quaternion.identity);
+                    effectObject.SetActive(true);
+                    foreach (var i in routes)
+                    {
+                        i.TileTargeting(false);
+                    }
+                    Destroy(gameObject);
                 }
             }
             else
@@ -29,10 +36,32 @@ public class Arrow : MonoBehaviour
                 if (playerLocation.x < 0)
                 {
                     GameManager.Instance.SendMessage("IsPlayerArrowHit", false);
+                    var effectObject = Instantiate(effect, transform.position, Quaternion.identity);
+                    effectObject.SetActive(true);
+                    foreach (var i in routes)
+                    {
+                        i.TileTargeting(false);
+                    }
+                    Destroy(gameObject);
                 }
             }
 
 
+        }
+        else if (other.tag == ConstData.building)
+        {
+            Tile tile = other.gameObject.GetComponent<Tile>();
+            if (destination.tileData.isMine == tile.tileData.isMine)
+            {
+                tile.TileHit(2);
+                var effectObject = Instantiate(effect, transform.position, Quaternion.identity);
+                effectObject.SetActive(true);
+                foreach (var i in routes)
+                {
+                    i.TileTargeting(false);
+                }
+                Destroy(gameObject);
+            }
         }
     }
     #endregion
@@ -45,9 +74,11 @@ public class Arrow : MonoBehaviour
         this.routes = routes;
     }
 
-    public void Fire()
+    public void Fire(GameObject effect)
     {
+        this.effect = effect;
         isShoot = true;
+
 
     }
 
@@ -59,7 +90,7 @@ public class Arrow : MonoBehaviour
     {
         if (destination.tileData.isMine)
         {
-            transform.Translate(new Vector3(destination.transform.position.x * 2f * Time.deltaTime, 0f, 0f) , Space.World);
+            transform.Translate(new Vector3(destination.transform.position.x * 2f * Time.deltaTime, 0f, 0f), Space.World);
             if (this.transform.position.x >= destination.transform.position.x + 3)
             {
                 isShoot = false;
@@ -67,12 +98,13 @@ public class Arrow : MonoBehaviour
                 {
                     i.TileTargeting(false);
                 }
+
                 Destroy(gameObject);
             }
         }
         else
         {
-            transform.Translate(new Vector3(destination.transform.position.x * 1f * Time.deltaTime, 0f, 0f) , Space.World);
+            transform.Translate(new Vector3(destination.transform.position.x * 1f * Time.deltaTime, 0f, 0f), Space.World);
             if (this.transform.position.x <= destination.transform.position.x - 3)
             {
 

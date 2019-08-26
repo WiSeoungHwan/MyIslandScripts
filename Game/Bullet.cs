@@ -17,9 +17,14 @@ public class Bullet : MonoBehaviour
         this.throwSimulator = gameObject.AddComponent<ThrowSimulator>();
     }
 
-    public void Fire(){
+    public void Fire(GameObject effect){
         throwSimulator.Shoot(this.transform,this.transform.position,destination.transform.position,10f,3f, ()=> {
             GameManager.Instance.SendMessage("IsPlayerHit", destination);
+            if(destination.tileData.tileState == TileState.building){
+                destination.TileHit(5);
+            }
+            var effectObject = Instantiate(effect,destination.transform.position, Quaternion.identity);
+            effectObject.SetActive(true);
             destination.TileTargeting(false);
             Destroy(gameObject);
             });

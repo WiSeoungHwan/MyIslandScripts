@@ -75,12 +75,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
     private void IsPlayerArrowHit(bool is1P){
         if (is1P){ // 적이 쏜거 - 내 타일 
-                playerUnitManager.UnitHit(1);
+                playerUnitManager.UnitHit(2);
                 Debug.Log("2P가 쏜 화살에 1P가 맞았습니다.");
 
         }else{ // 내가 쏜거 - 적타일 
 
-                enemyUnitManager.UnitHit(1);
+                enemyUnitManager.UnitHit(2);
                 Debug.Log("1p가 쏜 화살에 2P가 맞았습니다.");
         }
     }

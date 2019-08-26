@@ -12,16 +12,18 @@ public class Tower : MonoBehaviour
     private Bullet bullet;
     private Arrow arrow;
     private Scope scope;
+    private GameObject[] effects;
 
     #endregion
 
     #region Public Methods
 
-    public void TowerInit(TowerState state, int tileIndex, bool isMine)
+    public void TowerInit(TowerState state, int tileIndex, bool isMine, GameObject[] effects)
     {
         this.state = state;
         this.tileIndex = tileIndex;
         this.isMine = isMine;
+        this.effects = effects;
     }
 
     private void Fire()
@@ -29,11 +31,11 @@ public class Tower : MonoBehaviour
         Targeting(tileIndex);
         if (bullet)
         {
-            bullet.Fire();
+            bullet.Fire(effects[0]);
         }
         if (arrow)
         {
-            arrow.Fire();
+            arrow.Fire(effects[1]);
         }
         if (scope)
         {
@@ -143,7 +145,7 @@ public class Tower : MonoBehaviour
                     scopes.Add(ground.tileArr[i]);
                 }
                 
-                this.scope.ScopeInit(tile, scopes);
+                this.scope.ScopeInit(tile, scopes,effects[2]);
 
                 break;
         }

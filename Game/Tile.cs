@@ -13,12 +13,19 @@ public class Tile: MonoBehaviour{
 	private Text hpText;
 	[SerializeField]
 	private GameObject tileTargeting;
+	[SerializeField]
+	private GameObject[] effects;
+	[SerializeField]
+	private Canvas tileCanvas;
+	[SerializeField]
+	private TextMove headPopup;
 
 	public TileData tileData;
 
 	private Tower tower = null;
 	void Start(){
 		hpText.transform.position = hpTransform.position;
+		hpText.text = tileData.hp.ToString();
 		hpText.rectTransform.Rotate(Vector3.forward);
 	}
 
@@ -33,6 +40,12 @@ public class Tile: MonoBehaviour{
 		}
 		hpText.text = this.tileData.hp.ToString();
 	}
+	public void TileHeadPopUpActive(string text, Color color){
+        TextMove instance = Instantiate(this.headPopup);
+		instance.transform.gameObject.SetActive(true);
+        instance.transform.SetParent(tileCanvas.transform, false);
+        instance.SetText(text, color);
+    }
 	public void TileSetup(TileData tile, SkinData skinData){
 		// tile data 에 따라 프리펩 로드
 		// 우선 기반 타일 로드
@@ -46,7 +59,6 @@ public class Tile: MonoBehaviour{
 			// 자원일때 
 			case TileState.material:
 				// 어떤 자원을 불러올 것인지
-				
 				switch(tile.materialState){
 					case MaterialState.none:
 						break;
@@ -67,34 +79,60 @@ public class Tile: MonoBehaviour{
 				break;
 		}
 	}
+	public void TileHit(int damage){
+		this.tileData.hp -= damage;
+		TileHeadPopUpActive(damage.ToString(),Color.red);
+		if(this.tileData.hp <= 0){
+			
+			if(transform.childCount < 6){
+				Destroy(this.transform.GetChild(4).gameObject);
+			}
+			this.hpText.gameObject.SetActive(false);
+			this.tileData.hp = 10;
+			BoxCollider colider = gameObject.GetComponent<BoxCollider>();
+			colider.size = Vector3.one;
+			colider.center = Vector3.one;
+			tileData.tileState = TileState.normal;
+			this.tag = ConstData.normal;
+		}
+		this.hpText.text = tileData.hp.ToString();
+	}
 
 	public void BuildTower(TowerState state, GroundTile towerList){
+		
 		switch(state){
             case TowerState.parabola:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
 				this.tower = Instantiate(towerList[0], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
-				this.tower.TowerInit(state,tileData.index,tileData.isMine);
+				this.tower.TowerInit(state,tileData.index,tileData.isMine,effects);
 				this.tower.transform.parent = transform;
 				this.tower.gameObject.SetActive(true);
 				this.tileData.tileState = TileState.building;
+                this.tag = ConstData.building;
                 break;
             case TowerState.straight:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
 				this.tower = Instantiate(towerList[1], new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
-				this.tower.TowerInit(state,tileData.index,tileData.isMine);
+				this.tower.TowerInit(state,tileData.index,tileData.isMine, effects);
 				this.tower.transform.parent = transform;
 				this.tower.gameObject.SetActive(true);
 				this.tileData.tileState = TileState.building;
+                this.tag = ConstData.building;
                 break;
             case TowerState.scope:
 				GameManager.Instance.SendMessage("NotiTest", tileData, SendMessageOptions.RequireReceiver);
 				this.tower = Instantiate(towerList[2], new Vector3(transform.position.x,0f,transform.position.z), Quaternion.identity).AddComponent<Tower>();
-				this.tower.TowerInit(state,tileData.index,tileData.isMine);
+				this.tower.TowerInit(state,tileData.index,tileData.isMine, effects);
 				this.tower.transform.parent = transform;
 				this.tower.gameObject.SetActive(true);
 				this.tileData.tileState = TileState.building;
+                this.tag = ConstData.building;
                 break;
         }
+		hpText.transform.gameObject.SetActive(true);
+		BoxCollider colider = gameObject.GetComponent<BoxCollider>();
+		colider.size = new Vector3(1,1.5f,1);
+		colider.center = new Vector3(0,0.5f,0);
 		if(tileData.isMine){
 			this.tower.transform.Rotate(0,0,0);
 		}else{
@@ -137,6 +175,7 @@ public class Tile: MonoBehaviour{
 			Debug.Log("Tag problem");
 			prefabObject = null;
 		}
+		colider.isTrigger = true;
 		gameObject.tag = tag;
 		return prefabObject;
 	}
