@@ -29,8 +29,8 @@ public class PlayerScript : MonoBehaviour
     private bool isEnemyBuildMode;
     private int enemyCurrentBuilding = 1;// 기본 포물선 타워 
     private TowerLevelHandler towerLevelHandler;
-    private Tile bunker;
     
+
     #region Delegate
 
     public delegate void MaterialHit(MaterialState materialState, int num);
@@ -44,6 +44,7 @@ public class PlayerScript : MonoBehaviour
     private EnemyBuildTower enemyBuildTower = null;
     #endregion
     // MARK: - Public Fields
+    public Tile bunker ;
 
     // MARK: - MonoBehaviour
 
@@ -54,7 +55,7 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(GameManager.Instance.isGameOver){return;}
+        if (GameManager.Instance.isGameOver) { return; }
         PlayerAction();
     }
 
@@ -101,7 +102,7 @@ public class PlayerScript : MonoBehaviour
                         if (!tile.tileData.isMine) { return; } // 적의 타일을 클릭시 
                         if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
                         {
-                            
+
                             switch (tile.tileData.tileState)
                             {
                                 case TileState.normal:
@@ -111,19 +112,20 @@ public class PlayerScript : MonoBehaviour
                                     body.SetActive(true);
                                     break;
                                 case TileState.material:
-                                    if(bunker != null){return;}
-                                    if (!moveCount()) {return;}
+                                    if (bunker != null) { return; }
+                                    if (!moveCount()) { return; }
                                     Collect(tile);
                                     break;
                                 case TileState.building:
-                                    if(tile.tileData.towerState == TowerState.bunker){
-                                        if(!moveCount()){return;}
+                                    if (tile.tileData.towerState == TowerState.bunker)
+                                    {
+                                        if (!moveCount()) { return; }
                                         bunker = tile;
                                         Move(tile);
                                         body.SetActive(false);
                                     }
-                                    
-                                // 건물 눌렀을때
+
+                                    // 건물 눌렀을때
                                     break;
                             }
                             CheckAroundMove();
@@ -159,7 +161,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    
+
 
     private void Collect(Tile tile)
     {
@@ -233,13 +235,15 @@ public class PlayerScript : MonoBehaviour
             {
                 enemyCurrentBuilding = 3;
             }
-            if(Input.GetKeyDown("4")){
+            if (Input.GetKeyDown("4"))
+            {
                 enemyCurrentBuilding = 4;
             }
-            if(Input.GetKeyDown("5")){
+            if (Input.GetKeyDown("5"))
+            {
                 enemyCurrentBuilding = 5;
             }
-            
+
             int inputIndex = 0;
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
@@ -279,11 +283,14 @@ public class PlayerScript : MonoBehaviour
                 {
                     playerIndex += inputIndex;
                     gameObject.transform.position = new Vector3(tile.transform.position.x, transform.position.y, tile.transform.position.z);
+                    bunker = null;
+                    body.SetActive(true);
                 }
                 break;
             case TileState.material:
                 if (tile.tileData.index == playerIndex + 5 || tile.tileData.index == playerIndex - 5 || tile.tileData.index == playerIndex + 1 || tile.tileData.index == playerIndex - 1)
                 {
+                    if(bunker != null){return;}
                     if (moveCount())
                     {
                         tile.MaterialHit(ConstData.materialDamage);
@@ -292,28 +299,47 @@ public class PlayerScript : MonoBehaviour
                 }
                 break;
             case TileState.building:
-                Debug.Log("building");
+                if (tile.tileData.towerState == TowerState.bunker)
+                {
+                    if (!moveCount()) { return; }
+                    bunker = tile;
+                    playerIndex += inputIndex;
+                    gameObject.transform.position = new Vector3(tile.transform.position.x, transform.position.y, tile.transform.position.z);
+                    body.SetActive(false);
+                }
                 break;
         }
     }
-    private void BuildingEnemy(int inputIndex){
+    private void BuildingEnemy(int inputIndex)
+    {
         if (playerIndex + inputIndex < 0 || playerIndex + inputIndex > 24) { return; }
-            Tile tile = ground.tileArr[playerIndex + inputIndex];
-        
-            if(tile.tileData.tileState == TileState.normal){
-                if(enemyCurrentBuilding == 4 && enemyBuildTower(true)){
-                    tile.BuildTower(TowerState.table, towerLevelHandler.GetTable(0));
-                }else if(enemyBuildTower(false)){
-                    tile.BuildTower((TowerState)enemyCurrentBuilding, towerLevelHandler.GetTower(0));
-                }
-                this.BuildModeOff();
-                isEnemyBuildMode = false;
+        if(bunker != null){ return;}
+        Tile tile = ground.tileArr[playerIndex + inputIndex];
+
+        if (tile.tileData.tileState == TileState.normal)
+        {
+            if (enemyCurrentBuilding == 4 && enemyBuildTower(true))
+            {
+                tile.BuildTower(TowerState.table, towerLevelHandler.GetTable(0));
             }
-            
-            
+            else if (enemyCurrentBuilding == 5 && enemyBuildTower(false))
+            {
+                tile.BuildTower(TowerState.bunker, towerLevelHandler.GetBunker(0));
+                bunker = tile;
+            }
+            else if (enemyBuildTower(false))
+            {
+                tile.BuildTower((TowerState)enemyCurrentBuilding, towerLevelHandler.GetTower(0));
+            }
+            this.BuildModeOff();
+            isEnemyBuildMode = false;
+        }
+
+
     }
 
-    public int GetPlayerIndex(){
+    public int GetPlayerIndex()
+    {
         return playerIndex;
     }
 
@@ -325,7 +351,8 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    public void CheckAroundMove(){
+    public void CheckAroundMove()
+    {
         foreach (GameObject i in moveArea)
         {
             int aroundIndex = 0;
@@ -376,7 +403,8 @@ public class PlayerScript : MonoBehaviour
                     i.GetComponent<MeshRenderer>().material.color = Color.green;
                     break;
                 case TileState.building:
-                    if(tile.tileData.towerState == TowerState.bunker){
+                    if (tile.tileData.towerState == TowerState.bunker)
+                    {
                         i.GetComponent<MeshRenderer>().material.color = Color.blue;
                         i.SetActive(true);
                         break;
@@ -432,8 +460,10 @@ public class PlayerScript : MonoBehaviour
             switch (tile.tileData.tileState)
             {
                 case TileState.normal:
-                    for(int j = 0; j < i.transform.childCount; j++){
-                        if(i.transform.GetChild(j)){
+                    for (int j = 0; j < i.transform.childCount; j++)
+                    {
+                        if (i.transform.GetChild(j))
+                        {
                             Destroy(i.transform.GetChild(j).gameObject);
                         }
                     }
@@ -444,8 +474,10 @@ public class PlayerScript : MonoBehaviour
                     i.GetComponent<MeshRenderer>().material = normalMaterial;
                     break;
                 case TileState.material:
-                    for(int j = 0; j < i.transform.childCount; j++){
-                        if(i.transform.GetChild(j)){
+                    for (int j = 0; j < i.transform.childCount; j++)
+                    {
+                        if (i.transform.GetChild(j))
+                        {
                             Destroy(i.transform.GetChild(j).gameObject);
                         }
                     }
@@ -453,8 +485,10 @@ public class PlayerScript : MonoBehaviour
                     i.GetComponent<MeshRenderer>().material.color = Color.red;
                     break;
                 case TileState.building:
-                    for(int j = 0; j < i.transform.childCount; j++){
-                        if(i.transform.GetChild(j)){
+                    for (int j = 0; j < i.transform.childCount; j++)
+                    {
+                        if (i.transform.GetChild(j))
+                        {
                             Destroy(i.transform.GetChild(j).gameObject);
                         }
                     }

@@ -150,7 +150,6 @@ public class Tile: MonoBehaviour{
 		
 		switch(state){
             case TowerState.table:
-				
 				this.tower = Instantiate(tower, new Vector3(transform.position.x,0.1f,transform.position.z), Quaternion.identity);
 				this.tower.transform.parent = transform;
 				this.tower.gameObject.SetActive(true);

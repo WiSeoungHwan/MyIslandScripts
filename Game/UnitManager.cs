@@ -88,6 +88,7 @@ public class UnitManager : MonoBehaviour
     }
 
     public void UnitHit(int damage){
+        if(player.bunker != null){return;}
         playerData.hp -= damage;
         unitUIController.UnitHeadPopUpActive("-"+damage, Color.red);
         if (playerData.hp <= 0){
@@ -190,6 +191,11 @@ public class UnitManager : MonoBehaviour
 
     private void TowerSelected(TowerState state){
         if(!ground.tileArr[willBuildIndex]) {Debug.Log("ground[willBuildIndex] tile is null"); return;}
+        if(player.bunker != null){
+            unitUIController.UnitHeadPopUpActive("벙커에서 나오세요",Color.red);
+            player.CheckAroundMove();
+            return;
+        }
         if(playerData.materialData.wood > 4){
             playerData.activeCount -= 1;
             stamina.Hurt(1);
