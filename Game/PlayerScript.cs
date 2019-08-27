@@ -33,7 +33,7 @@ public class PlayerScript : MonoBehaviour
     public delegate void MaterialHit(MaterialState materialState, int num);
     public delegate bool MoveCount();
     public delegate void BuildingAreaTap(Vector3 clickPoint, int groundIndex);
-    public delegate bool EnemyBuildTower();
+    public delegate bool EnemyBuildTower(bool isTable);
 
     private MaterialHit materialHit = null;
     private MoveCount moveCount = null;
@@ -220,6 +220,9 @@ public class PlayerScript : MonoBehaviour
             {
                 enemyCurrentBuilding = 3;
             }
+            if(Input.GetKeyDown("4")){
+                enemyCurrentBuilding = 4;
+            }
             int inputIndex = 0;
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
@@ -280,8 +283,12 @@ public class PlayerScript : MonoBehaviour
         if (playerIndex + inputIndex < 0 || playerIndex + inputIndex > 24) { return; }
             Tile tile = ground.tileArr[playerIndex + inputIndex];
         
-            if(tile.tileData.tileState == TileState.normal && enemyBuildTower()){
-                tile.BuildTower((TowerState)enemyCurrentBuilding, towerLevelHandler.GetTower(0));
+            if(tile.tileData.tileState == TileState.normal){
+                if(enemyCurrentBuilding == 4 && enemyBuildTower(true)){
+                    tile.BuildTower(TowerState.table, towerLevelHandler.GetTable(0));
+                }else if(enemyBuildTower(false)){
+                    tile.BuildTower((TowerState)enemyCurrentBuilding, towerLevelHandler.GetTower(0));
+                }
                 this.BuildModeOff();
                 isEnemyBuildMode = false;
             }

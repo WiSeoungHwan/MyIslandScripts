@@ -114,7 +114,15 @@ public class UnitManager : MonoBehaviour
         Debug.Log("activeCount: " + playerData.activeCount);
     }
 
-    private bool EnemyBuildTower(){
+    private bool EnemyBuildTower(bool isTable){
+        
+        if(playerData.tableCount <= 0 && !isTable){
+            return false;
+        }else if(isTable){
+            playerData.tableCount += 1;
+            return true;
+        }
+
         if (playerData.activeCount > 0 && playerData.materialData.wood > 4) {
             playerData.materialData.wood -= 5;
             playerData.activeCount--;
