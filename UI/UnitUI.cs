@@ -26,14 +26,14 @@ public class UnitUI : MonoBehaviour
     private Text unitHP;
     [SerializeField]
     private GameObject practicableArea;
-    [SerializeField]
-    private PiUIManager piUIManager;
+
     [SerializeField]
     private Slider unitHpSlider;
     [SerializeField]
     private TextMove headPopup;
     [SerializeField]
     private GameObject towerUnActivePanel;
+    
     private TowerLevelHandler towerLevelHandler;
 
     #endregion
@@ -131,6 +131,7 @@ public class UnitUI : MonoBehaviour
                 break;
             case "Bunker":
                 state = TowerState.bunker;
+                tower = towerLevelHandler.GetBunker(0);
                 break;
             default:
                 state = TowerState.none;
@@ -144,22 +145,6 @@ public class UnitUI : MonoBehaviour
     }
 
 
-    // public void BuildUIActive(Vector3 clickPoint){
-    //     buildUIPosition = Camera.main.WorldToScreenPoint(clickPoint);
-	// 	piUIManager.ChangeMenuState("NormalMenu",buildUIPosition);
-    // }
-
-    // public void BuildUIUnActive(){
-    //     if(piUIManager.PiOpened("NormalMenu"))
-    //         piUIManager.ChangeMenuState("NormalMenu");
-    //     if(piUIManager.PiOpened("TowerMenu"))
-    //         piUIManager.ChangeMenuState("TowerMenu");
-    // }
-
-    // public void TowerUITap(){
-    //     piUIManager.ChangeMenuState("NormalMenu");
-    //     piUIManager.ChangeMenuState("TowerMenu",buildUIPosition);
-    // }
 
     // - Tower button func 
 

@@ -132,12 +132,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         }
     }
 
-    
-
-    private void NotiTest(TileData tileData){
-        Debug.Log("NotiTest: " + tileData.isMine + tileData.index);
-    }
-
     #endregion
 
     #region Public Methods

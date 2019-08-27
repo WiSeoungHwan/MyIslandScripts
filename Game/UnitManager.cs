@@ -120,6 +120,11 @@ public class UnitManager : MonoBehaviour
             return false;
         }else if(isTable){
             playerData.tableCount += 1;
+            playerData.materialData.wood -= 5;
+            playerData.activeCount--;
+            stamina.Hurt(1);
+            unitUIController.UnitUIUpdate(playerData);
+            unitUIController.MaterialUIUpdate(playerData);
             return true;
         }
 
@@ -197,10 +202,12 @@ public class UnitManager : MonoBehaviour
                 tile.BuildTower(state, towerLevelHandler.GetTable(0));
                 playerData.playerLevel = 0;
                 playerData.tableCount += 1;
+            }else if(state == TowerState.bunker){
+                tile.BuildTower(state,towerLevelHandler.GetBunker(0));
             }else{
                 tile.BuildTower(state,towerLevelHandler.GetTower(playerData.playerLevel));
             }
-            
+            unitUIController.UnitUIUpdate(playerData);
             player.CheckAroundMove();
         }else{
             unitUIController.UnitHeadPopUpActive("자원 없음!",Color.red);

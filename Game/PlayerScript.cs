@@ -17,6 +17,8 @@ public class PlayerScript : MonoBehaviour
     Material normalMaterial;
     [SerializeField]
     Material moveMaterial;
+    [SerializeField]
+    GameObject body;
 
     private Ground ground;
 
@@ -27,6 +29,7 @@ public class PlayerScript : MonoBehaviour
     private bool isEnemyBuildMode;
     private int enemyCurrentBuilding = 1;// 기본 포물선 타워 
     private TowerLevelHandler towerLevelHandler;
+    private Tile bunker;
     
     #region Delegate
 
@@ -103,13 +106,23 @@ public class PlayerScript : MonoBehaviour
                             {
                                 case TileState.normal:
                                     if (!moveCount()) { return; }
+                                    bunker = null;
                                     Move(tile);
+                                    body.SetActive(true);
                                     break;
                                 case TileState.material:
-                                    if (!moveCount()) { return; }
+                                    if(bunker != null){return;}
+                                    if (!moveCount()) {return;}
                                     Collect(tile);
                                     break;
                                 case TileState.building:
+                                    if(tile.tileData.towerState == TowerState.bunker){
+                                        if(!moveCount()){return;}
+                                        bunker = tile;
+                                        Move(tile);
+                                        body.SetActive(false);
+                                    }
+                                    
                                 // 건물 눌렀을때
                                     break;
                             }
@@ -223,6 +236,10 @@ public class PlayerScript : MonoBehaviour
             if(Input.GetKeyDown("4")){
                 enemyCurrentBuilding = 4;
             }
+            if(Input.GetKeyDown("5")){
+                enemyCurrentBuilding = 5;
+            }
+            
             int inputIndex = 0;
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
@@ -359,6 +376,11 @@ public class PlayerScript : MonoBehaviour
                     i.GetComponent<MeshRenderer>().material.color = Color.green;
                     break;
                 case TileState.building:
+                    if(tile.tileData.towerState == TowerState.bunker){
+                        i.GetComponent<MeshRenderer>().material.color = Color.blue;
+                        i.SetActive(true);
+                        break;
+                    }
                     i.SetActive(false);
                     break;
             }
