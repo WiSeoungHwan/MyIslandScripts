@@ -170,7 +170,7 @@ public class Tile: MonoBehaviour{
         }
 		hpText.transform.gameObject.SetActive(true);
 		BoxCollider colider = gameObject.GetComponent<BoxCollider>();
-		colider.size = new Vector3(1,1.5f,1);
+		colider.size = new Vector3(1,1.2f,1);
 		colider.center = new Vector3(0,0.5f,0);
 		if(tileData.isMine){
 			this.tower.transform.Rotate(0,0,0);
