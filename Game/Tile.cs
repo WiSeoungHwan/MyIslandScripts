@@ -19,7 +19,6 @@ public class Tile: MonoBehaviour{
 	private Canvas tileCanvas;
 	[SerializeField]
 	private TextMove headPopup;
-
 	public TileData tileData;
 
 	private GameObject tower = null;
