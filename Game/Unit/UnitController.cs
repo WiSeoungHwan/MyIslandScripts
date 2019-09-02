@@ -13,11 +13,14 @@ namespace MyIsland
         private Ground ground;
         #endregion
 
-
+        #region Private Field
+        private bool isPlayer;
+        #endregion
 
         #region Public Method
-        public void UnitControllerInit(GameObject selectedTheme, MaterialInitData materialInitData){
-            ground.GroundInit(selectedTheme,materialInitData);
+        public void UnitControllerInit(bool isPlayer,GameObject selectedTheme, MaterialInitData materialInitData){
+            this.isPlayer = isPlayer;
+            ground.GroundInit(isPlayer,selectedTheme,materialInitData);
         }
         #endregion
     }
