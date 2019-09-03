@@ -13,20 +13,28 @@ namespace MyIsland
     }
     public class Tile : MonoBehaviour
     {
-        #region Private Field
-        private TileData tileData;
+        #region Serialize Field
+        [SerializeField]
+        TileUI tileUI;
+        #endregion
+        #region Property
+        public TileData tileData{get; set;}
 
         #endregion
 
+        #region Private Field
+        private GameObject obj;
+        #endregion
 
 
         #region Public Methods
         public void TileInit(TileData tileData)
         {
             this.tileData = tileData;
+            
             if (tileData.tileState == TileState.MATERIAL)
             {
-                GameObject obj;
+                
                 switch (tileData.materialState)
                 {
                     case MaterialState.WOOD:
@@ -47,8 +55,27 @@ namespace MyIsland
                 }
                 obj.transform.position = new Vector3(transform.position.x, 0f,transform.position.z);
                 obj.SetActive(true);
+                tileUI.TileUISetActive(true);
+                tileUI.TileUIUpdate(tileData.hp);
+            }else{
+                tileUI.TileUISetActive(false);
             }
         }
+
+        public bool TileHurt(int demage){
+            
+            if(tileData.hp <= 0){
+                MaterialObjectPool.Instance.Remove(tileData.materialState,obj);
+                tileData.tileState = TileState.NORMAL;
+                tileUI.TileUISetActive(false);
+                return false;
+            }
+            tileData.hp -= demage;
+            tileUI.TileUIUpdate(tileData.hp);
+            return true;
+        }
+
+        
         #endregion
     }
 }

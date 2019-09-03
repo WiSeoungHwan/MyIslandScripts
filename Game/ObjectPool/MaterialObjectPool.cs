@@ -27,9 +27,9 @@ namespace MyIsland
         #endregion
 
         #region MonoBehaviour Callbacks
-        protected override void OnStart()
+        protected override void OnAwake()
         {
-            base.OnStart();
+            base.OnAwake();
             woodPool = new GameObjectPool<GameObject>(8, () =>
             {
                 GameObject obj = Instantiate(woodPrefab);

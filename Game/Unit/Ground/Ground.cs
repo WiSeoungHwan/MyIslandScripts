@@ -29,6 +29,14 @@ namespace MyIsland
             GroundInstance(selectedTheme);
             TileSort(materialInitData);
         }
+
+        public Tile GetTile(int index){
+            if(tileList[index]){
+                return tileList[index];
+            }
+            Debug.Log("GetTile Fail");
+            return null;
+        }
         #endregion
 
         #region Private Methods
@@ -77,8 +85,9 @@ namespace MyIsland
             TileData tileData;
             int currentRemainingMaterial = initData.wood.count + initData.stone.count + initData.iron.count + initData.adam.count;
             // 남은 자원의 숫자가 들어갈 자원의 숫자와 같으면  
-            if (currentRemainingMaterial == tileSponeIndexCount)
+            if (currentRemainingMaterial == tileSponeIndexCount) // 12 보다 클 수 없음
             {
+                
                 if (initData.wood.count > 0)
                 {
                     tileData = new TileData(isPlayerGround, index, initData.wood.amount, TileState.MATERIAL, MaterialState.WOOD);

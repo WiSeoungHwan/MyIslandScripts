@@ -16,7 +16,9 @@ namespace MyIsland
         private MaterialInitCount materialInitCount;
         [SerializeField]
         private MaterialInitCount materialInitAmount;
-        
+        // Unit 시작 데이터 설정 
+        [SerializeField]
+        private UnitInitData unitInitData;
         // player 진영 
         [SerializeField]
         private UnitController playerController;
@@ -78,8 +80,8 @@ namespace MyIsland
                     amount = materialInitAmount.adamCount
                 },
             };
-            playerController.UnitControllerInit(true, selecetedTheme, playerMaterialInitData);
-            enemyController.UnitControllerInit(false, selecetedTheme,EnemyMaterialInitData);
+            playerController.UnitControllerInit(true, selecetedTheme, playerMaterialInitData,unitInitData);
+            enemyController.UnitControllerInit(false, selecetedTheme,EnemyMaterialInitData,unitInitData);
         }
         #endregion
 
