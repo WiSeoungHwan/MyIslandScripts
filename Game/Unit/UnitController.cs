@@ -42,7 +42,9 @@ namespace MyIsland
                 unitControl.transform.position = ReturnMovePos(unitData.unitIndex);
             }
             // 델리게이트 설정
-            unitControl.SetDelegate(Move, Collect);
+            if(isPlayer){
+                unitControl.SetDelegate(Move, Collect);
+            }
 
 
         }
@@ -73,8 +75,10 @@ namespace MyIsland
                     unitData.unitMaterial.adam += unitData.unitDemage;
                     break;
             }
+            if(isPlayer){
+                EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT,this, unitData.unitMaterial);
+            }
             
-            Debug.Log(unitData.unitMaterial.wood);
 
         }
         private bool isNearTile(int clickTileIndex){
