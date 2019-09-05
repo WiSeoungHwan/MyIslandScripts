@@ -5,17 +5,18 @@ using UnityEngine;
 
 namespace MyIsland
 {
-    public enum BuildingEnum{
-        TABLE,
-        BUNKER,
-        PARABOLA,
-        STRAIGHT,
-        SCOPE
+    public enum TowerEnum{
+        TOWER_1,
+        TOWER_2,
+        TOWER_3
     }
-    public class Tower : MonoBehaviour
+    public class Tower : Building
     {
-        // Start is called before the first frame update
-
+        #region MonoBehaviour CallBack
+        void Start(){
+            this.buildingKind = BuildingKind.TOWER;
+        } 
+        #endregion
     }
 
 }

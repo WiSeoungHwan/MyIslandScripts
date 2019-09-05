@@ -4,7 +4,12 @@ using UnityEngine;
 
 public enum EVENT_TYPE {
     MATERIAL_COLLECT,
-    TABLE_COUNT_CHANGE
+    TABLE_COUNT_CHANGE,
+    TOWER_WILL_BUILD,
+    TABLE_WILL_BUILD,
+    BUNKER_WILL_BUILD,
+    WILL_BUILD_OFF,
+    
 }
 
 public class EventManager: MonoBehaviour 

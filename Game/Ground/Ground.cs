@@ -75,10 +75,6 @@ namespace MyIsland
                     index++;
                 }
             }
-            Debug.Log("wood " + initData.wood.count);
-            Debug.Log("stone " + initData.stone.count);
-            Debug.Log("iron " + initData.iron.count);
-            Debug.Log("adam " + initData.adam.count);
         }
         private TileData RandomMaterial(int index, int tileSponeIndexCount, MaterialInitData initData)
         {

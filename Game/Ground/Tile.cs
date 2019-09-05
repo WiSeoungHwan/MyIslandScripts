@@ -15,7 +15,10 @@ namespace MyIsland
     {
         #region Serialize Field
         [SerializeField]
-        TileUI tileUI;
+        private TileUI tileUI;
+        [SerializeField]
+        private GameObject willBuildObject;
+        private Building onBuildingObject;
         #endregion
         #region Property
         public TileData tileData{get; set;}
@@ -23,38 +26,51 @@ namespace MyIsland
         #endregion
 
         #region Private Field
-        private GameObject obj;
+        private GameObject materialObj;
+        private TileState beforeTileState;
         #endregion
 
+        #region MonoBehaviour Callbacks
+        void OnMouseDown(){
+            if(willBuildObject.activeInHierarchy){
+                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF,this);
+                
+                willBuildObject.SetActive(false);
+                tileData.tileState = TileState.BUILDING;
+            }
+        }
+        #endregion
 
         #region Public Methods
         public void TileInit(TileData tileData)
         {
             this.tileData = tileData;
-            
+            beforeTileState = tileData.tileState;
+            willBuildObject.SetActive(false);
+            EventManager.Instance.on(EVENT_TYPE.WILL_BUILD_OFF, WillBuildObjectOff);
             if (tileData.tileState == TileState.MATERIAL)
             {
                 
                 switch (tileData.materialState)
                 {
                     case MaterialState.WOOD:
-                        obj = MaterialObjectPool.Instance.Pop(MaterialState.WOOD);
+                        materialObj = MaterialObjectPool.Instance.Pop(MaterialState.WOOD);
                         break;
                     case MaterialState.STONE:
-                        obj = MaterialObjectPool.Instance.Pop(MaterialState.STONE);
+                        materialObj = MaterialObjectPool.Instance.Pop(MaterialState.STONE);
                         break;
                     case MaterialState.IRON:
-                        obj = MaterialObjectPool.Instance.Pop(MaterialState.IRON);
+                        materialObj = MaterialObjectPool.Instance.Pop(MaterialState.IRON);
                         break;
                     case MaterialState.ADAM:
-                        obj = MaterialObjectPool.Instance.Pop(MaterialState.ADAM);
+                        materialObj = MaterialObjectPool.Instance.Pop(MaterialState.ADAM);
                         break;
                     default:
-                        obj = MaterialObjectPool.Instance.Pop(MaterialState.WOOD);
+                        materialObj = MaterialObjectPool.Instance.Pop(MaterialState.WOOD);
                         break;
                 }
-                obj.transform.position = new Vector3(transform.position.x, 0f,transform.position.z);
-                obj.SetActive(true);
+                materialObj.transform.position = new Vector3(transform.position.x, 0f,transform.position.z);
+                materialObj.SetActive(true);
                 tileUI.TileUISetActive(true);
                 tileUI.TileUIUpdate(tileData.hp);
             }else{
@@ -62,10 +78,30 @@ namespace MyIsland
             }
         }
 
+        public void WillBuildTower(TowerPoolList towerKey){
+            willBuildObject.SetActive(true);
+            beforeTileState = tileData.tileState;
+            tileData.tileState = TileState.BUILDING;
+        }
+        
+        public void WillBuildTable(TablePoolList towerKey){
+            willBuildObject.SetActive(true);
+            beforeTileState = tileData.tileState;
+            onBuildingObject = TableObjectPool.Instance.Pop(towerKey).GetComponent<Building>();
+            onBuildingObject.gameObject.SetActive(true);
+            onBuildingObject.transform.position = Vector3.zero;
+            tileData.tileState = TileState.BUILDING;
+        }
+        public void WillBuildBunker(BunkerPoolList towerKey){
+            willBuildObject.SetActive(true);
+            beforeTileState = tileData.tileState;
+            tileData.tileState = TileState.BUILDING;
+        }
+        
+
         public bool TileHurt(int demage){
-            
             if(tileData.hp <= 0){
-                MaterialObjectPool.Instance.Remove(tileData.materialState,obj);
+                MaterialObjectPool.Instance.Remove(tileData.materialState,materialObj);
                 tileData.tileState = TileState.NORMAL;
                 tileUI.TileUISetActive(false);
                 return false;
@@ -74,8 +110,14 @@ namespace MyIsland
             tileUI.TileUIUpdate(tileData.hp);
             return true;
         }
+        #endregion
 
-        
+        #region Private Methods
+        private void WillBuildObjectOff(EVENT_TYPE eventType, Component sender, object param = null){
+            willBuildObject.SetActive(false);
+
+            tileData.tileState = beforeTileState;
+        }
         #endregion
     }
 }

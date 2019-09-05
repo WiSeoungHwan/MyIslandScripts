@@ -63,25 +63,6 @@ namespace MyIsland
         #endregion
 
         #region Public Methods
-        public void Reset(MaterialState state, GameObject obj)
-        {
-            switch (state)
-            {
-                case MaterialState.WOOD:
-                    woodPool.push(obj);
-                    break;
-                case MaterialState.STONE:
-                    stonePool.push(obj);
-                    break;
-                case MaterialState.IRON:
-                    ironPool.push(obj);
-                    break;
-                case MaterialState.ADAM:
-                    adamPool.push(obj);
-                    break;
-            }
-            obj.SetActive(false);
-        }
 
         public void Remove(MaterialState state, GameObject obj)
         {
@@ -117,5 +98,26 @@ namespace MyIsland
         }
         #endregion
 
+        #region Private Methods
+        private void Reset(MaterialState state, GameObject obj)
+        {
+            switch (state)
+            {
+                case MaterialState.WOOD:
+                    woodPool.push(obj);
+                    break;
+                case MaterialState.STONE:
+                    stonePool.push(obj);
+                    break;
+                case MaterialState.IRON:
+                    ironPool.push(obj);
+                    break;
+                case MaterialState.ADAM:
+                    adamPool.push(obj);
+                    break;
+            }
+            obj.SetActive(false);
+        }
+        #endregion
     }
 }

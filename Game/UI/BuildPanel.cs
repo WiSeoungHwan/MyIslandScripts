@@ -22,10 +22,18 @@ namespace MyIsland
         private Button scopeButton;
         #endregion
 
+        #region Private Field
+        private int currentBuiding;
+        #endregion
+
         #region MonoBehaviour CallBack
         void Start()
         {
             EventManager.Instance.on(EVENT_TYPE.TABLE_COUNT_CHANGE, TableCountChange);
+            bunkerButton.gameObject.SetActive(false);
+            parabolaButton.gameObject.SetActive(false);
+            straightButton.gameObject.SetActive(false);
+            scopeButton.gameObject.SetActive(false);
         }
         void OnDestory()
         {
@@ -54,9 +62,44 @@ namespace MyIsland
         #endregion
 
         #region Public Methods
-        public void EmitBuildEvent(int buiding)
+        public void TowerBuildButtonTap(int building)
         {
-            Debug.Log((BuildingEnum)buiding);
+            if (currentBuiding == building)
+            {
+                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
+                currentBuiding = currentBuiding + 1;
+            }
+            else
+            {
+                EventManager.Instance.emit(EVENT_TYPE.TOWER_WILL_BUILD, this, (TowerEnum)building);
+                currentBuiding = building;
+            }
+        }
+        public void TableBuildButtonTap(int building)
+        {
+            if (currentBuiding == building)
+            {
+                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
+                currentBuiding = currentBuiding + 1;
+            }
+            else
+            {
+                EventManager.Instance.emit(EVENT_TYPE.TABLE_WILL_BUILD, this);
+                currentBuiding = building;
+            }
+        }
+        public void BunkerBuildButtonTap(int building)
+        {
+            if (currentBuiding == building)
+            {
+                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
+                currentBuiding = currentBuiding + 1;
+            }
+            else
+            {
+                EventManager.Instance.emit(EVENT_TYPE.BUNKER_WILL_BUILD, this);
+                currentBuiding = building;
+            }
         }
         #endregion
     }
