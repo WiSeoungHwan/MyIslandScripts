@@ -13,6 +13,8 @@ namespace MyIsland
         private Ground ground;
         [SerializeField]
         private UnitControl unitControl;
+        [SerializeField]
+        private GameObject[] unitNearArea;
         #endregion
 
         #region Private Field
@@ -45,7 +47,7 @@ namespace MyIsland
             // 델리게이트 설정
             if (isPlayer)
             {
-                unitControl.SetDelegate(Move, Collect);
+                unitControl.SetDelegate(Move, Collect, Build);
             }
             // 이벤트 리스너 등록
             if (isPlayer)
@@ -91,8 +93,23 @@ namespace MyIsland
             {
                 EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT, this, unitData.unitMaterial);
             }
-
-
+        }
+        private void Build(Tile tile){
+            foreach (var i in NearTileList(unitData.unitIndex))
+            {
+                Tile nearTile = ground.GetTile(i);
+                if(nearTile.tileData.tileState != TileState.WILL_BUILD){continue;}
+                if(tile.tileData.index == nearTile.tileData.index){
+                    if(tile.GetBuildingKind() == BuildingKind.TABLE){
+                        unitData.tableCount++;
+                        
+                        EventManager.Instance.emit(EVENT_TYPE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
+                    }
+                    tile.Build();
+                    continue;
+                }
+                nearTile.BuildOff();
+            }
         }
 
         // Tile 관련
@@ -203,7 +220,7 @@ namespace MyIsland
                     playerLevelTower = (9, 10, 11);
                     break;
             }
-            TowerPoolList towerKey = TowerPoolList.WOOD_1;
+            TowerPoolList towerKey;
             switch (buildingEnum)
             {
                 case TowerEnum.TOWER_1:
@@ -215,6 +232,9 @@ namespace MyIsland
                 case TowerEnum.TOWER_3:
                     towerKey = (TowerPoolList)playerLevelTower.Item3;
                     break;
+                default:
+                    towerKey = TowerPoolList.WOOD_1;
+                    break;
             }
 
             foreach (var i in nearTileIndexs)
@@ -222,6 +242,7 @@ namespace MyIsland
                 Tile tile = ground.GetTile(i);
                 if (tile.tileData.tileState == TileState.NORMAL)
                 {
+                    Debug.Log(towerKey);
                     tile.WillBuildTower(towerKey);
                 }
             }

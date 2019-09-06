@@ -19,9 +19,11 @@ namespace MyIsland
         #region Delegete
         public delegate void Move(int clickTileIndex);
         public delegate void Collect(MaterialState materialState, int clickTileIndex);
+        public delegate void Build(Tile tile);
 
         private Move move = null;
         private Collect collect = null;
+        private Build build = null;
         #endregion
 
         #region Serialize Field
@@ -34,16 +36,17 @@ namespace MyIsland
         #endregion
 
         #region Public Methods
-        public void SetDelegate(Move move, Collect collect){
+        public void SetDelegate(Move move, Collect collect, Build build){
             this.move = move;
             this.collect = collect;
+            this.build = build;
         }
         #endregion
 
         #region Private Methods
 
         private void UnitAction(){
-             if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0))
             {
                 // get hitInfo
                 RaycastHit hitInfo;
@@ -51,21 +54,24 @@ namespace MyIsland
                 if (Physics.Raycast(ray, out hitInfo))
                 {
                     if(hitInfo.transform.gameObject.GetComponent<Tile>()){// 타일 클릭했을때 
-                        TileData tileData = hitInfo.transform.gameObject.GetComponent<Tile>().tileData;
-                        if(!tileData.isPlayerGround){return;}
-                        switch(tileData.tileState){
+                        Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
+                        if(!tile.tileData.isPlayerGround){return;}
+                        switch(tile.tileData.tileState){
                             case TileState.NORMAL:
-                                move(tileData.index);
+                                move(tile.tileData.index);
                                 break;
                             case TileState.MATERIAL:
-                                collect(tileData.materialState, tileData.index);
+                                collect(tile.tileData.materialState, tile.tileData.index);
                                 break;
                             case TileState.BUILDING:
                                 break;
+                            case TileState.WILL_BUILD:
+                                build(tile);
+                                break;
                         }
-                        
                     }
                 }
+                
             }
         }
         

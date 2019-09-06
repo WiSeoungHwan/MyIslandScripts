@@ -9,7 +9,8 @@ namespace MyIsland
     {
         NORMAL,
         MATERIAL,
-        BUILDING
+        BUILDING,
+        WILL_BUILD
     }
     public class Tile : MonoBehaviour
     {
@@ -21,23 +22,21 @@ namespace MyIsland
         private Building onBuildingObject;
         #endregion
         #region Property
-        public TileData tileData{get; set;}
+        public TileData tileData { get; set; }
 
         #endregion
 
         #region Private Field
         private GameObject materialObj;
         private TileState beforeTileState;
+        private bool buildingOn = false;
+        private int key;
         #endregion
 
         #region MonoBehaviour Callbacks
-        void OnMouseDown(){
-            if(willBuildObject.activeInHierarchy){
-                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF,this);
-                
-                willBuildObject.SetActive(false);
-                tileData.tileState = TileState.BUILDING;
-            }
+        void OnMouseDown()
+        {
+            
         }
         #endregion
 
@@ -47,10 +46,9 @@ namespace MyIsland
             this.tileData = tileData;
             beforeTileState = tileData.tileState;
             willBuildObject.SetActive(false);
-            EventManager.Instance.on(EVENT_TYPE.WILL_BUILD_OFF, WillBuildObjectOff);
             if (tileData.tileState == TileState.MATERIAL)
             {
-                
+
                 switch (tileData.materialState)
                 {
                     case MaterialState.WOOD:
@@ -69,39 +67,66 @@ namespace MyIsland
                         materialObj = MaterialObjectPool.Instance.Pop(MaterialState.WOOD);
                         break;
                 }
-                materialObj.transform.position = new Vector3(transform.position.x, 0f,transform.position.z);
+                materialObj.transform.position = new Vector3(transform.position.x, 1f, transform.position.z);
                 materialObj.SetActive(true);
                 tileUI.TileUISetActive(true);
                 tileUI.TileUIUpdate(tileData.hp);
-            }else{
+            }
+            else
+            {
                 tileUI.TileUISetActive(false);
             }
         }
 
-        public void WillBuildTower(TowerPoolList towerKey){
-            willBuildObject.SetActive(true);
-            beforeTileState = tileData.tileState;
+        public void Build(){
+            willBuildObject.SetActive(false);
             tileData.tileState = TileState.BUILDING;
+            tileUI.TileUISetActive(true);
+            tileData.hp = 10;
+            tileUI.TileUIUpdate(tileData.hp);
         }
-        
-        public void WillBuildTable(TablePoolList towerKey){
-            willBuildObject.SetActive(true);
-            beforeTileState = tileData.tileState;
-            onBuildingObject = TableObjectPool.Instance.Pop(towerKey).GetComponent<Building>();
-            onBuildingObject.gameObject.SetActive(true);
-            onBuildingObject.transform.position = Vector3.zero;
-            tileData.tileState = TileState.BUILDING;
-        }
-        public void WillBuildBunker(BunkerPoolList towerKey){
-            willBuildObject.SetActive(true);
-            beforeTileState = tileData.tileState;
-            tileData.tileState = TileState.BUILDING;
-        }
-        
 
-        public bool TileHurt(int demage){
-            if(tileData.hp <= 0){
-                MaterialObjectPool.Instance.Remove(tileData.materialState,materialObj);
+        public void BuildOff(){
+            willBuildObject.SetActive(false);
+            tileData.tileState = beforeTileState;
+            if(onBuildingObject){
+                switch(onBuildingObject.buildingKind){
+                    case BuildingKind.TABLE:
+                        TableObjectPool.Instance.Remove((TablePoolList)key, onBuildingObject.gameObject);
+                        break;
+                    case BuildingKind.TOWER:
+                        TowerObjectPool.Instance.Remove((TowerPoolList)key, onBuildingObject.gameObject);
+                        break;
+                    case BuildingKind.BUNKER:
+                        BunkerObjectPool.Instance.Remove((BunkerPoolList)key, onBuildingObject.gameObject);
+                        break;
+                }
+            }
+        }
+
+        public void WillBuildTower(TowerPoolList towerKey)
+        {
+            var obj = TowerObjectPool.Instance.Pop(towerKey).GetComponent<Building>();
+            WillBuildSetup((int)towerKey, obj);
+        }
+
+        public void WillBuildTable(TablePoolList towerKey)
+        {
+            var obj = TableObjectPool.Instance.Pop(towerKey).GetComponent<Building>();
+            WillBuildSetup((int)towerKey, obj);
+        }
+        public void WillBuildBunker(BunkerPoolList towerKey)
+        {
+            var obj = BunkerObjectPool.Instance.Pop(towerKey).GetComponent<Building>();
+            WillBuildSetup((int)towerKey, obj);
+        }
+
+
+        public bool TileHurt(int demage)
+        {
+            if (tileData.hp <= 0)
+            {
+                MaterialObjectPool.Instance.Remove(tileData.materialState, materialObj);
                 tileData.tileState = TileState.NORMAL;
                 tileUI.TileUISetActive(false);
                 return false;
@@ -110,13 +135,22 @@ namespace MyIsland
             tileUI.TileUIUpdate(tileData.hp);
             return true;
         }
+
+        public BuildingKind GetBuildingKind(){
+            return onBuildingObject.buildingKind;
+        }
         #endregion
 
         #region Private Methods
-        private void WillBuildObjectOff(EVENT_TYPE eventType, Component sender, object param = null){
-            willBuildObject.SetActive(false);
-
-            tileData.tileState = beforeTileState;
+        
+        private void WillBuildSetup(int key, Building onBuildingObject){
+            willBuildObject.SetActive(true);
+            beforeTileState = tileData.tileState;
+            this.onBuildingObject = onBuildingObject;
+            this.onBuildingObject.gameObject.SetActive(true);
+            this.onBuildingObject.transform.position = new Vector3(willBuildObject.transform.position.x, 1f, willBuildObject.transform.position.z);
+            this.key = (int)key;
+            tileData.tileState = TileState.WILL_BUILD;
         }
         #endregion
     }
