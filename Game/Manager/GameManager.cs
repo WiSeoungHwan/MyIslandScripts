@@ -27,9 +27,15 @@ namespace MyIsland
         private UnitController enemyController;
         #endregion
 
+        #region Private Field
+        private int towerFireTime;
+        #endregion
+
+        
+
 
         #region MonoBehaviour CallBacks
-        void Start(){
+        protected override void OnStart(){
             GameInit();
         }
         #endregion
@@ -82,7 +88,20 @@ namespace MyIsland
             };
             playerController.UnitControllerInit(true, selecetedTheme, playerMaterialInitData,unitInitData);
             enemyController.UnitControllerInit(false, selecetedTheme,EnemyMaterialInitData,unitInitData);
+
+            StartCoroutine("OneSecTimer");
         }
+
+        IEnumerator OneSecTimer(){
+        yield return new WaitForSeconds(1);
+        towerFireTime++;
+        Debug.Log(towerFireTime);
+        if(towerFireTime >= 5){
+            towerFireTime = 0;
+            EventManager.Instance.emit(EVENT_TYPE.GM_FIRE,this);
+        }
+        StartCoroutine("OneSecTimer");
+    }
         #endregion
 
         

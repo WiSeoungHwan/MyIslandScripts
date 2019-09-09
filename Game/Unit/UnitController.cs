@@ -47,7 +47,7 @@ namespace MyIsland
             // 델리게이트 설정
             if (isPlayer)
             {
-                unitControl.SetDelegate(Move, Collect, Build);
+                unitControl.SetDelegate(Move, Collect, Build, BuildTap);
             }
             // 이벤트 리스너 등록
             if (isPlayer)
@@ -55,6 +55,7 @@ namespace MyIsland
                 EventManager.Instance.on(EVENT_TYPE.TOWER_WILL_BUILD, TowerButtonTap);
                 EventManager.Instance.on(EVENT_TYPE.TABLE_WILL_BUILD, TableButtonTap);
                 EventManager.Instance.on(EVENT_TYPE.BUNKER_WILL_BUILD, BunkerButtonTap);
+                EventManager.Instance.on(EVENT_TYPE.WILL_BUILD_OFF,BuildOff);
             }
 
         }
@@ -66,6 +67,7 @@ namespace MyIsland
         private void Move(int clickTileIndex)  // 플레이어가 노멀타일을 클릭하면 들어오는 함수 클릭한 타일의 인덱스가 들어옴 
         {
             if (!isNearTile(clickTileIndex)) { return; }
+            unitControl.BodyActive(true);
             unitControl.transform.position = ReturnMovePos(clickTileIndex);
             unitData.unitIndex = clickTileIndex;
 
@@ -94,28 +96,151 @@ namespace MyIsland
                 EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT, this, unitData.unitMaterial);
             }
         }
-        private void Build(Tile tile){
+        private void Build(Tile tile)
+        {
             foreach (var i in NearTileList(unitData.unitIndex))
             {
                 Tile nearTile = ground.GetTile(i);
-                if(nearTile.tileData.tileState != TileState.WILL_BUILD){continue;}
-                if(tile.tileData.index == nearTile.tileData.index){
-                    if(tile.GetBuildingKind() == BuildingKind.TABLE){
-                        unitData.tableCount++;
-                        
-                        EventManager.Instance.emit(EVENT_TYPE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
+                if (nearTile.tileData.tileState != TileState.WILL_BUILD) { continue; }
+                if (tile.tileData.index == nearTile.tileData.index)
+                {
+                    bool hasMaterial = false;
+
+                    switch (unitData.unitLevel)
+                    {
+                        case 0:
+                            if (unitData.unitMaterial.wood >= 5)
+                            {
+                                hasMaterial = true;
+                                unitData.unitMaterial.wood -= 5;
+                            }
+                            break;
+                        case 1:
+                            if (unitData.unitMaterial.wood >= 5)
+                            {
+                                hasMaterial = true;
+                                unitData.unitMaterial.wood -= 5;
+                            }
+                            break;
+
+                        case 2:
+                            if (unitData.unitMaterial.stone >= 5)
+                            {
+                                hasMaterial = true;
+                                unitData.unitMaterial.stone -= 5;
+                            }
+                            break;
+
+                        case 3:
+                            if (unitData.unitMaterial.iron >= 5)
+                            {
+                                hasMaterial = true;
+                                unitData.unitMaterial.iron -= 5;
+                            }
+                            break;
+                        case 4:
+                            if (unitData.unitMaterial.adam >= 5)
+                            {
+                                hasMaterial = true;
+                                unitData.unitMaterial.adam -= 5;
+                            }
+                            break;
                     }
-                    tile.Build();
+                    if (!hasMaterial)
+                    {
+                        tile.BuildOff();
+                        continue;
+                    }
+                    switch (tile.GetBuildingKind())
+                    {
+                        case BuildingKind.TABLE:
+                            unitData.tableCount++;
+                            if (unitData.unitLevel == 0)
+                            {
+                                unitData.unitLevel = 1;
+                            }
+                            EventManager.Instance.emit(EVENT_TYPE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
+                            break;
+                        case BuildingKind.BUNKER:
+                            break;
+                        case BuildingKind.TOWER:
+                            break;
+                    }
+
+                    if (hasMaterial)
+                    {
+                        tile.Build();
+                        EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT, this, unitData.unitMaterial);
+                    }
                     continue;
                 }
                 nearTile.BuildOff();
             }
         }
 
+        private void BuildTap(Tile tile)
+        {
+            switch (tile.GetBuildingKind())
+            {
+                case BuildingKind.TABLE:
+                    tile.ButtonUISetActive(() =>
+                    {
+                        bool hasMaterial = false;
+
+                        switch (unitData.unitLevel)
+                        {
+                            case 1:
+                                if (unitData.unitMaterial.wood >= 10)
+                                {
+                                    hasMaterial = true;
+                                    unitData.unitMaterial.wood -= 10;
+                                }
+                                break;
+                            case 2:
+                                if (unitData.unitMaterial.stone >= 10)
+                                {
+                                    hasMaterial = true;
+                                    unitData.unitMaterial.stone -= 10;
+                                }
+                                break;
+                            case 3:
+                                if (unitData.unitMaterial.iron >= 10)
+                                {
+                                    hasMaterial = true;
+                                    unitData.unitMaterial.iron -= 10;
+                                }
+                                break;
+
+                        }
+
+                        if (hasMaterial)
+                        {
+                            tile.UpgradeTable(unitData.unitLevel);
+                            unitData.unitLevel++;
+                            EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT, this, unitData.unitMaterial);
+
+                        }
+                        else
+                        {
+                            Debug.Log("업그레이드 자원부족");
+                        }
+                    });
+                    break;
+                case BuildingKind.BUNKER:
+                    if(isNearTile(tile.tileData.index)){
+                        unitControl.BodyActive(false);
+                        unitControl.transform.position = ReturnMovePos(tile.tileData.index);
+                        unitData.unitIndex = tile.tileData.index;
+                    }
+                    break;
+            }
+        }
+
         // Tile 관련
         private bool isNearTile(int clickTileIndex)
         {
-            if(clickTileIndex < 0 || clickTileIndex > 24){
+            if (clickTileIndex < 0 || clickTileIndex > 24)
+            {
                 return false;
             }
             bool isNearTile = false;
@@ -178,9 +303,16 @@ namespace MyIsland
             foreach (var i in nearTileIndexs)
             {
                 Tile tile = ground.GetTile(i);
-                if (tile.tileData.tileState == TileState.NORMAL)
+                if (tile.tileData.tileState == TileState.NORMAL || tile.tileData.tileState == TileState.WILL_BUILD)
                 {
-                    tile.WillBuildTable((TablePoolList)unitData.unitLevel);
+                    if(unitData.unitLevel == 4){
+                        tile.WillBuildTable((TablePoolList)3);
+                    }
+                    if(unitData.unitLevel != 0){
+                        tile.WillBuildTable((TablePoolList)unitData.unitLevel - 1);
+                    }else{
+                        tile.WillBuildTable((TablePoolList)unitData.unitLevel);
+                    }
                 }
             }
         }
@@ -190,9 +322,12 @@ namespace MyIsland
             foreach (var i in nearTileIndexs)
             {
                 Tile tile = ground.GetTile(i);
-                if (tile.tileData.tileState == TileState.NORMAL)
+                if (tile.tileData.tileState == TileState.NORMAL || tile.tileData.tileState == TileState.WILL_BUILD)
                 {
-                    tile.WillBuildBunker((BunkerPoolList)unitData.unitLevel);
+                    if(unitData.unitLevel == 4){
+                        tile.WillBuildBunker((BunkerPoolList)3);
+                    }
+                    tile.WillBuildBunker((BunkerPoolList)unitData.unitLevel - 1);
                 }
             }
         }
@@ -240,10 +375,19 @@ namespace MyIsland
             foreach (var i in nearTileIndexs)
             {
                 Tile tile = ground.GetTile(i);
-                if (tile.tileData.tileState == TileState.NORMAL)
+                if (tile.tileData.tileState == TileState.NORMAL || tile.tileData.tileState == TileState.WILL_BUILD)
                 {
-                    Debug.Log(towerKey);
                     tile.WillBuildTower(towerKey);
+                }
+            }
+        }
+
+        private void BuildOff(EVENT_TYPE eventType, Component sender, object param = null){
+            var nearTileIndexs = NearTileList(unitData.unitIndex);
+            foreach (var i in nearTileIndexs){
+                Tile tile = ground.GetTile(i);
+                if(tile.tileData.tileState == TileState.WILL_BUILD){
+                    tile.BuildOff();
                 }
             }
         }

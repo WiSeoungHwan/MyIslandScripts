@@ -28,10 +28,13 @@ namespace MyIsland
             this.isPlayerGround = isPlayerGround;
             GroundInstance(selectedTheme);
             TileSort(materialInitData);
+            EventManager.Instance.on(EVENT_TYPE.TOWER_FIRE,TileTargeting);
         }
 
-        public Tile GetTile(int index){
-            if(tileList[index]){
+        public Tile GetTile(int index)
+        {
+            if (tileList[index])
+            {
                 return tileList[index];
             }
             Debug.Log("GetTile Fail");
@@ -40,6 +43,74 @@ namespace MyIsland
         #endregion
 
         #region Private Methods
+
+        private void TileTargeting(EVENT_TYPE eventType, Component sender, object param = null)
+        {
+            if ((Tower)sender)
+            {
+                Tower tower = (Tower)sender;
+                if (tower.TowerData.isPlayerGround == isPlayerGround) { return; }
+                RandomTargeting(tower);
+            }
+        }
+
+        private void RandomTargeting(Tower tower)
+        {
+            var towerData = tower.TowerData;
+            switch (towerData.towerKind)
+            {
+                case TowerKind.PARABOLA:
+                    Tile tile = GetTile(RandomNum(towerData.tileIndex));
+                    tower.Targeting(tile);
+                    break; 
+                case TowerKind.STRAIGHT:
+                    break;
+                case TowerKind.SCOPE:
+                    break;
+            }
+        }
+        private int RandomNum(int num)
+        {
+            List<int> numList = new List<int>();
+            if (num == 0 || num % 5 == 0)
+            {
+                numList.Add(num + 1);
+                numList.Add(num - 5);
+                numList.Add(num + 5);
+                numList.Add(num + 6);
+                numList.Add(num - 4);
+            }
+            else if (num == 4 || (num - 4) % 5 == 0)
+            {
+                numList.Add(num - 1);
+                numList.Add(num - 5);
+                numList.Add(num + 5);
+                numList.Add(num - 6);
+                numList.Add(num + 4);
+            }
+            else
+            {
+                numList.Add(num - 1);
+                numList.Add(num + 1);
+                numList.Add(num - 5);
+                numList.Add(num + 5);
+                numList.Add(num - 6);
+                numList.Add(num + 6);
+                numList.Add(num - 4);
+                numList.Add(num + 4);
+            }
+            numList.Add(num);
+            for (int i = numList.Count - 1; i >= 0; i--)
+            {
+                if (numList[i] > 24 || numList[i] < 0)
+                {
+                    numList.RemoveAt(i);
+                }
+            }
+            var randomNum = Random.Range(0, numList.Count);
+            return numList[randomNum];
+        }
+
 
         private void GroundInstance(GameObject selectedTheme)
         {
@@ -63,7 +134,7 @@ namespace MyIsland
                     if (tileSponeIndex.Contains(index))
                     {
                         // 남은 자원 숫자 
-                        tileData = RandomMaterial(index, tileSponeIndex.Count,initData);
+                        tileData = RandomMaterial(index, tileSponeIndex.Count, initData);
                         tileSponeIndex.Remove(index);
                     }
                     else
@@ -83,7 +154,7 @@ namespace MyIsland
             // 남은 자원의 숫자가 들어갈 자원의 숫자와 같으면  
             if (currentRemainingMaterial == tileSponeIndexCount) // 12 보다 클 수 없음
             {
-                
+
                 if (initData.wood.count > 0)
                 {
                     tileData = new TileData(isPlayerGround, index, initData.wood.amount, TileState.MATERIAL, MaterialState.WOOD);
@@ -134,10 +205,12 @@ namespace MyIsland
                     {
                         tileData = new TileData(isPlayerGround, index, initData.wood.amount, TileState.MATERIAL, MaterialState.ADAM);
                         initData.adam.count--;
-                    }else{
+                    }
+                    else
+                    {
                         tileData = new TileData(isPlayerGround, index, 100, TileState.NORMAL);
                     }
-                    
+
                 }
                 else
                 {

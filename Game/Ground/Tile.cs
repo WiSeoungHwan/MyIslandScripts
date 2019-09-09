@@ -21,6 +21,7 @@ namespace MyIsland
         private GameObject willBuildObject;
         private Building onBuildingObject;
         #endregion
+
         #region Property
         public TileData tileData { get; set; }
 
@@ -84,11 +85,23 @@ namespace MyIsland
             tileUI.TileUISetActive(true);
             tileData.hp = 10;
             tileUI.TileUIUpdate(tileData.hp);
+            switch(onBuildingObject.buildingKind){
+                case BuildingKind.TOWER:
+                    // Get Tower Component
+                    Tower tower = onBuildingObject.GetComponent<Tower>();
+                    tower.TowerInit(tileData.isPlayerGround, tileData.index);
+                    tower.BuildComplete = true;
+                    break;
+            }
         }
 
         public void BuildOff(){
             willBuildObject.SetActive(false);
-            tileData.tileState = beforeTileState;
+            if(beforeTileState == TileState.WILL_BUILD){
+                tileData.tileState = TileState.NORMAL;
+            }else{
+                tileData.tileState = beforeTileState;
+            }
             if(onBuildingObject){
                 switch(onBuildingObject.buildingKind){
                     case BuildingKind.TABLE:
@@ -101,6 +114,8 @@ namespace MyIsland
                         BunkerObjectPool.Instance.Remove((BunkerPoolList)key, onBuildingObject.gameObject);
                         break;
                 }
+                onBuildingObject = null;
+
             }
         }
 
@@ -121,6 +136,14 @@ namespace MyIsland
             WillBuildSetup((int)towerKey, obj);
         }
 
+        public void UpgradeTable(int key){
+            TableObjectPool.Instance.Remove((TablePoolList)key - 1, onBuildingObject.gameObject);
+            var obj = TableObjectPool.Instance.Pop((TablePoolList)key).GetComponent<Building>();
+            WillBuildSetup(key,obj);
+            tileData.tileState = TileState.BUILDING;
+            willBuildObject.SetActive(false);
+        }
+
 
         public bool TileHurt(int demage)
         {
@@ -139,19 +162,45 @@ namespace MyIsland
         public BuildingKind GetBuildingKind(){
             return onBuildingObject.buildingKind;
         }
+
+        public void ButtonUISetActive(UpgradeButtonTap upgrade){
+            tileUI.SetDelegate(upgrade);
+            tileUI.TablePanelSetActive();
+        }
         #endregion
 
         #region Private Methods
         
         private void WillBuildSetup(int key, Building onBuildingObject){
+            OnBuildingClear();
             willBuildObject.SetActive(true);
-            beforeTileState = tileData.tileState;
             this.onBuildingObject = onBuildingObject;
             this.onBuildingObject.gameObject.SetActive(true);
             this.onBuildingObject.transform.position = new Vector3(willBuildObject.transform.position.x, 1f, willBuildObject.transform.position.z);
             this.key = (int)key;
             tileData.tileState = TileState.WILL_BUILD;
         }
+
+        private void OnBuildingClear(){
+            beforeTileState = tileData.tileState;
+            if(onBuildingObject){
+                switch(onBuildingObject.buildingKind){
+                    case BuildingKind.TABLE:
+                        TableObjectPool.Instance.Remove((TablePoolList)key,onBuildingObject.gameObject);
+                        break;
+                    case BuildingKind.TOWER:
+                        TowerObjectPool.Instance.Remove((TowerPoolList)key,onBuildingObject.gameObject);
+                        break;
+                    case BuildingKind.BUNKER:
+                        BunkerObjectPool.Instance.Remove((BunkerPoolList)key,onBuildingObject.gameObject);
+                        break;
+                }
+                onBuildingObject = null;
+                willBuildObject.SetActive(false);
+            }
+        }
+
+        
         #endregion
     }
 }

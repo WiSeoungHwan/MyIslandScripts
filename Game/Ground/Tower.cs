@@ -10,12 +10,49 @@ namespace MyIsland
         TOWER_2,
         TOWER_3
     }
+
     public class Tower : Building
     {
+        #region Serialize Field
+        [SerializeField]
+        private TowerData _towerData;
+        [SerializeField]
+        private Bullet bullet;
+        
+        #endregion
+
+        #region Properties
+        public TowerData TowerData{
+            get{
+                return _towerData;
+            }
+            set{
+                _towerData = value;
+            }
+        }
+        public bool BuildComplete{get; set;}
+        #endregion 
+
         #region MonoBehaviour CallBack
         void Start(){
+            BuildComplete = false;
+            EventManager.Instance.on(EVENT_TYPE.GM_FIRE,Fire);
             this.buildingKind = BuildingKind.TOWER;
-        } 
+        }
+        #endregion
+        
+        #region Public Methods
+        public void Targeting(Tile tile){
+            bullet.Targeting(tile,TowerData.towerDamage);
+        }
+        public void Fire(EVENT_TYPE eventType, Component sender, object param = null){
+            if(BuildComplete == false){return;}
+            EventManager.Instance.emit(EVENT_TYPE.TOWER_FIRE,this);
+        }
+        public void TowerInit(bool isPlayerGround, int tileIndex){
+            this.TowerData.isPlayerGround = isPlayerGround;
+            this.TowerData.tileIndex = tileIndex;
+        }
         #endregion
     }
 

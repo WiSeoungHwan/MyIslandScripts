@@ -20,10 +20,12 @@ namespace MyIsland
         public delegate void Move(int clickTileIndex);
         public delegate void Collect(MaterialState materialState, int clickTileIndex);
         public delegate void Build(Tile tile);
+        public delegate void BuildTap(Tile tile);
 
         private Move move = null;
         private Collect collect = null;
         private Build build = null;
+        private BuildTap buildTap = null;
         #endregion
 
         #region Serialize Field
@@ -36,10 +38,15 @@ namespace MyIsland
         #endregion
 
         #region Public Methods
-        public void SetDelegate(Move move, Collect collect, Build build){
+        public void SetDelegate(Move move, Collect collect, Build build, BuildTap buildTap){
             this.move = move;
             this.collect = collect;
             this.build = build;
+            this.buildTap = buildTap;
+        }
+
+        public void BodyActive(bool active){
+            body.SetActive(active);
         }
         #endregion
 
@@ -64,6 +71,7 @@ namespace MyIsland
                                 collect(tile.tileData.materialState, tile.tileData.index);
                                 break;
                             case TileState.BUILDING:
+                                buildTap(tile);
                                 break;
                             case TileState.WILL_BUILD:
                                 build(tile);

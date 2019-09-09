@@ -67,7 +67,7 @@ namespace MyIsland
             if (currentBuiding == building)
             {
                 EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
-                currentBuiding = currentBuiding + 1;
+                currentBuiding = 5;
             }
             else
             {
@@ -80,7 +80,7 @@ namespace MyIsland
             if (currentBuiding == building)
             {
                 EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
-                currentBuiding = currentBuiding + 1;
+                currentBuiding = 5;
             }
             else
             {
@@ -93,7 +93,7 @@ namespace MyIsland
             if (currentBuiding == building)
             {
                 EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
-                currentBuiding = currentBuiding + 1;
+                currentBuiding = 5;
             }
             else
             {
