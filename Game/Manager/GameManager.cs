@@ -9,7 +9,7 @@ namespace MyIsland
         #region Serialize Field
         // 그라운드의 테마 
         [SerializeField]
-        private GameObject selecetedTheme;
+        private GameObject[] selecetedTheme;
 
         // 자원 데이터 커스터마이징 
         [SerializeField]

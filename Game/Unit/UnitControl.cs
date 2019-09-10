@@ -35,14 +35,16 @@ namespace MyIsland
 
         #region Private Fields
         private UnitState unitState;
+        private bool isPlayerGround;
         #endregion
 
         #region Public Methods
-        public void SetDelegate(Move move, Collect collect, Build build, BuildTap buildTap){
+        public void SetDelegate(Move move, Collect collect, Build build, BuildTap buildTap, bool isPlayerGround){
             this.move = move;
             this.collect = collect;
             this.build = build;
             this.buildTap = buildTap;
+            this.isPlayerGround = isPlayerGround;
         }
 
         public void BodyActive(bool active){
@@ -53,6 +55,7 @@ namespace MyIsland
         #region Private Methods
 
         private void UnitAction(){
+        if(isPlayerGround){ /// 1p
             if (Input.GetMouseButtonDown(0))
             {
                 // get hitInfo
@@ -79,8 +82,11 @@ namespace MyIsland
                         }
                     }
                 }
-                
             }
+        }else{ // 2p
+            
+        }
+            
         }
         
         #endregion

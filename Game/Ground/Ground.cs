@@ -23,11 +23,10 @@ namespace MyIsland
         #endregion
 
         #region Public Methods
-        public void GroundInit(bool isPlayerGround, GameObject selectedTheme, MaterialInitData materialInitData)
+        public void GroundInit(bool isPlayerGround, GameObject[] selectedTheme, MaterialInitData materialInitData)
         {
             this.isPlayerGround = isPlayerGround;
-            GroundInstance(selectedTheme);
-            TileSort(materialInitData);
+            TileSort(materialInitData,selectedTheme);
             EventManager.Instance.on(EVENT_TYPE.TOWER_FIRE,TileTargeting);
         }
 
@@ -112,14 +111,14 @@ namespace MyIsland
         }
 
 
-        private void GroundInstance(GameObject selectedTheme)
+        private void GroundInstance(GameObject selectedTheme,Tile tile)
         {
             // 그라운드 인스턴스 
-            GameObject ground = Instantiate(selectedTheme, body.position, Quaternion.identity);
-            ground.transform.SetParent(body);
+            GameObject ground = Instantiate(selectedTheme,  tile.transform.position, Quaternion.identity);
+            ground.transform.SetParent(tile.transform);
             ground.SetActive(true);
         }
-        private void TileSort(MaterialInitData initData)
+        private void TileSort(MaterialInitData initData,GameObject[] selectedTheme)
         {
             int index = 0;
             List<int> tileSponeIndex = new List<int>() { 0, 1, 2, 4, 9, 14, 22, 23, 24, 10, 15, 20 };
@@ -128,8 +127,10 @@ namespace MyIsland
             {
                 for (int j = 0; j < 5; j++)
                 {
+                    int ran = Random.Range(0,selectedTheme.Length);
                     Vector3 pos = new Vector3(i + transform.position.x, 0.35f, j);
                     Tile tile = TileLoad(pos);
+                    GroundInstance(selectedTheme[ran], tile);
                     TileData tileData;
                     if (tileSponeIndex.Contains(index))
                     {

@@ -8,7 +8,8 @@ namespace MyIsland
     {
         public int unitLevel{get; set;}
         public int unitIndex{get; set;}
-        public int unitHp{get; set;}
+        public float unitHp{get; set;}
+        public float unitMaxHp{get; set;}
         public int unitDemage{get;set;}
         public int stamina{get; set;}
         public int tableCount{get;set;}

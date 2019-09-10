@@ -1,18 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class UnitUI : MonoBehaviour
+namespace MyIsland
 {
-    // Start is called before the first frame update
-    void Start()
+    public class UnitUI : MonoBehaviour
     {
-        
+        #region Serialize Field
+        [SerializeField]
+        private Text unitHpText;
+
+        [SerializeField]
+        private Image unitHpImage;
+        #endregion
+
+
+        #region Public Methods
+        public void UnitUIUpdate(UnitData unitData)
+        {
+            unitHpText.text = unitData.unitHp.ToString();
+            unitHpImage.fillAmount = (unitData.unitMaxHp * unitData.unitHp) * 0.01f;
+        }
+        #endregion
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

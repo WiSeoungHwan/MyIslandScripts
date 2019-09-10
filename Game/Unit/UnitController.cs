@@ -15,15 +15,18 @@ namespace MyIsland
         private UnitControl unitControl;
         [SerializeField]
         private GameObject[] unitNearArea;
+        [SerializeField]
+        private UnitUI unitUI;
         #endregion
 
         #region Private Field
         private bool isPlayer;
+        private bool onBunker;
         private UnitData unitData;
         #endregion
 
         #region Public Method
-        public void UnitControllerInit(bool isPlayer, GameObject selectedTheme, MaterialInitData materialInitData, UnitInitData unitInitData)
+        public void UnitControllerInit(bool isPlayer, GameObject[] selectedTheme, MaterialInitData materialInitData, UnitInitData unitInitData)
         {
             //플레이어 진영인지
             this.isPlayer = isPlayer;
@@ -35,19 +38,21 @@ namespace MyIsland
                 unitLevel = unitInitData.unitLevel,
                 unitIndex = unitInitData.unitIndex,
                 unitHp = unitInitData.unitHp,
+                unitMaxHp = unitInitData.unitHp,
                 unitDemage = unitInitData.unitDemage,
                 tableCount = 0,
                 unitMaterial = new UnitMaterialData()
             };
             // 유닛 위치 초기화 
-            if (isPlayer)
-            {
-                unitControl.transform.position = ReturnMovePos(unitData.unitIndex);
-            }
+            unitControl.transform.position = ReturnMovePos(unitData.unitIndex);
+
+            // 유닛 HUD 초기화
+            unitUI.UnitUIUpdate(unitData);
+
             // 델리게이트 설정
             if (isPlayer)
             {
-                unitControl.SetDelegate(Move, Collect, Build, BuildTap);
+                unitControl.SetDelegate(Move, Collect, Build, BuildTap, isPlayer);
             }
             // 이벤트 리스너 등록
             if (isPlayer)
@@ -55,9 +60,10 @@ namespace MyIsland
                 EventManager.Instance.on(EVENT_TYPE.TOWER_WILL_BUILD, TowerButtonTap);
                 EventManager.Instance.on(EVENT_TYPE.TABLE_WILL_BUILD, TableButtonTap);
                 EventManager.Instance.on(EVENT_TYPE.BUNKER_WILL_BUILD, BunkerButtonTap);
-                EventManager.Instance.on(EVENT_TYPE.WILL_BUILD_OFF,BuildOff);
+                EventManager.Instance.on(EVENT_TYPE.WILL_BUILD_OFF, BuildOff);
             }
 
+            EventManager.Instance.on(EVENT_TYPE.TILE_HIT, IsPlayerHit);
         }
         #endregion
 
@@ -68,13 +74,14 @@ namespace MyIsland
         {
             if (!isNearTile(clickTileIndex)) { return; }
             unitControl.BodyActive(true);
+            onBunker = false;
             unitControl.transform.position = ReturnMovePos(clickTileIndex);
             unitData.unitIndex = clickTileIndex;
 
         }
         private void Collect(MaterialState materialState, int clickTileIndex)
         { // 플레이어가 자원 타일을 클릭하면 들어오는 함수 
-            if (!isNearTile(clickTileIndex)) { return; }
+            if (!isNearTile(clickTileIndex) && onBunker) {return;}
             if (ground.GetTile(clickTileIndex).TileHurt(unitData.unitDemage) == false) { return; }
             switch (materialState)
             {
@@ -98,6 +105,7 @@ namespace MyIsland
         }
         private void Build(Tile tile)
         {
+            if(onBunker){return;}
             foreach (var i in NearTileList(unitData.unitIndex))
             {
                 Tile nearTile = ground.GetTile(i);
@@ -227,7 +235,9 @@ namespace MyIsland
                     });
                     break;
                 case BuildingKind.BUNKER:
-                    if(isNearTile(tile.tileData.index)){
+                    if (isNearTile(tile.tileData.index))
+                    {
+                        onBunker = true;
                         unitControl.BodyActive(false);
                         unitControl.transform.position = ReturnMovePos(tile.tileData.index);
                         unitData.unitIndex = tile.tileData.index;
@@ -291,6 +301,29 @@ namespace MyIsland
             return nearTileIndexs;
         }
 
+        private void IsPlayerHit(EVENT_TYPE eventType, Component sender, object param = null)
+        {
+            if ((Tile)param)
+            {
+                Tile tile = (Tile)param;
+                if (tile.tileData.isPlayerGround == isPlayer && unitData.unitIndex == tile.tileData.index)
+                {
+                    Bullet bullet = (Bullet)sender;
+                    PlayerHit(bullet.Damage);
+                }
+            }
+        }
+        private void PlayerHit(float damage)
+        {
+            unitData.unitHp -= damage;
+            if (unitData.unitHp <= 0)
+            {
+                unitData.unitHp = 0;
+            }
+            unitUI.UnitUIUpdate(unitData);
+            Debug.Log("Unit Hit!" + unitData.unitHp);
+        }
+
         private Vector3 ReturnMovePos(int index)
         {
             Vector3 tilePos = ground.GetTile(index).transform.position;
@@ -299,18 +332,23 @@ namespace MyIsland
 
         private void TableButtonTap(EVENT_TYPE eventType, Component sender, object param = null)
         {
+            if(onBunker){return;}
             var nearTileIndexs = NearTileList(unitData.unitIndex);
             foreach (var i in nearTileIndexs)
             {
                 Tile tile = ground.GetTile(i);
                 if (tile.tileData.tileState == TileState.NORMAL || tile.tileData.tileState == TileState.WILL_BUILD)
                 {
-                    if(unitData.unitLevel == 4){
+                    if (unitData.unitLevel == 4)
+                    {
                         tile.WillBuildTable((TablePoolList)3);
                     }
-                    if(unitData.unitLevel != 0){
+                    if (unitData.unitLevel != 0)
+                    {
                         tile.WillBuildTable((TablePoolList)unitData.unitLevel - 1);
-                    }else{
+                    }
+                    else
+                    {
                         tile.WillBuildTable((TablePoolList)unitData.unitLevel);
                     }
                 }
@@ -318,13 +356,15 @@ namespace MyIsland
         }
         private void BunkerButtonTap(EVENT_TYPE eventType, Component sender, object param = null)
         {
+            if(onBunker){return;}
             var nearTileIndexs = NearTileList(unitData.unitIndex);
             foreach (var i in nearTileIndexs)
             {
                 Tile tile = ground.GetTile(i);
                 if (tile.tileData.tileState == TileState.NORMAL || tile.tileData.tileState == TileState.WILL_BUILD)
                 {
-                    if(unitData.unitLevel == 4){
+                    if (unitData.unitLevel == 4)
+                    {
                         tile.WillBuildBunker((BunkerPoolList)3);
                     }
                     tile.WillBuildBunker((BunkerPoolList)unitData.unitLevel - 1);
@@ -334,6 +374,7 @@ namespace MyIsland
 
         private void TowerButtonTap(EVENT_TYPE eventType, Component sender, object param = null)
         {
+            if(onBunker){return;}
             TowerEnum buildingEnum = (TowerEnum)param;
             var nearTileIndexs = NearTileList(unitData.unitIndex);
             var playerLevelTower = (0, 0, 0);
@@ -382,11 +423,14 @@ namespace MyIsland
             }
         }
 
-        private void BuildOff(EVENT_TYPE eventType, Component sender, object param = null){
+        private void BuildOff(EVENT_TYPE eventType, Component sender, object param = null)
+        {
             var nearTileIndexs = NearTileList(unitData.unitIndex);
-            foreach (var i in nearTileIndexs){
+            foreach (var i in nearTileIndexs)
+            {
                 Tile tile = ground.GetTile(i);
-                if(tile.tileData.tileState == TileState.WILL_BUILD){
+                if (tile.tileData.tileState == TileState.WILL_BUILD)
+                {
                     tile.BuildOff();
                 }
             }

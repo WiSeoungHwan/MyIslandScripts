@@ -43,7 +43,7 @@ namespace MyIsland
         
         #region Public Methods
         public void Targeting(Tile tile){
-            bullet.Targeting(tile,TowerData.towerDamage);
+            bullet.Targeting(tile,TowerData.towerDamage,this.TowerData.towerKind);
         }
         public void Fire(EVENT_TYPE eventType, Component sender, object param = null){
             if(BuildComplete == false){return;}

@@ -10,7 +10,8 @@ public enum EVENT_TYPE {
     BUNKER_WILL_BUILD,
     WILL_BUILD_OFF,
     TOWER_FIRE,
-    GM_FIRE
+    GM_FIRE,
+    TILE_HIT
     
 }
 

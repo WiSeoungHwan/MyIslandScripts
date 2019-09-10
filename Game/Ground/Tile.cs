@@ -19,6 +19,8 @@ namespace MyIsland
         private TileUI tileUI;
         [SerializeField]
         private GameObject willBuildObject;
+        [SerializeField]
+        private GameObject[] targetingMark;
         private Building onBuildingObject;
         #endregion
 
@@ -44,6 +46,9 @@ namespace MyIsland
         #region Public Methods
         public void TileInit(TileData tileData)
         {
+            foreach(var i in targetingMark){
+                i.SetActive(false);
+            }
             this.tileData = tileData;
             beforeTileState = tileData.tileState;
             willBuildObject.SetActive(false);
@@ -76,6 +81,19 @@ namespace MyIsland
             else
             {
                 tileUI.TileUISetActive(false);
+            }
+        }
+        public void TargetingSetActive(TowerKind towerKind, bool active){
+            switch(towerKind){
+                case TowerKind.PARABOLA:
+                    targetingMark[0].SetActive(active);
+                    break;
+                case TowerKind.STRAIGHT:
+                    targetingMark[1].SetActive(active);
+                    break;
+                case TowerKind.SCOPE:
+                    targetingMark[2].SetActive(active);
+                    break;
             }
         }
 
