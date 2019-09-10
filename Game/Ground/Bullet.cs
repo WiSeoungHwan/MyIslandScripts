@@ -51,6 +51,8 @@ namespace MyIsland
             _towerKind = towerKind;
             Fire();
         }
+
+        
         #endregion
     }
 }

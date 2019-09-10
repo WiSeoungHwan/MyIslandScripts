@@ -63,6 +63,24 @@ namespace MyIsland
                     tower.Targeting(tile);
                     break; 
                 case TowerKind.STRAIGHT:
+                    tile = GetTile(isPlayerGround ? tower.TowerData.tileIndex % 5: tower.TowerData.tileIndex % 5 + 20);
+                    tower.Targeting(tile);
+                    List<Tile> routes = new List<Tile>();
+                for (int i = 0; i < 5; ++i)
+                {
+                    Tile route;
+                    if (isPlayerGround)
+                    {
+                        route = tileList[tile.tileData.index + 5 * i];
+                    }
+                    else
+                    {
+                        route = tileList[(tile.tileData.index % 5) + 5 * i];
+                    }
+                    route.TargetingSetActive(TowerKind.STRAIGHT,true);
+                    routes.Add(route);
+                    }
+                    
                     break;
                 case TowerKind.SCOPE:
                     break;
