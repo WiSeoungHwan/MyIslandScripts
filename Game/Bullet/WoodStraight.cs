@@ -8,18 +8,15 @@ namespace MyIsland
     {
         #region Private Field
         private bool isShoot;
+        private List<Tile> routes = new List<Tile>();
         #endregion
 
         #region Collider
         private void OnTriggerEnter(Collider other)
         {
-            if (other.tag == "Player")
+            if (other.tag == this.tag)
             {
-                isShoot = false;
-                EventManager.Instance.emit(EVENT_TYPE.TILE_HIT,this,TargetTile);
-                Effect.Play();
-                StartCoroutine("PositionReset");
-                
+                this.Hit();
             }
         }
         #endregion
@@ -27,9 +24,24 @@ namespace MyIsland
         public override void Fire()
         {
             base.Fire();
+            isShoot = true;
+        }
+        public override void Hit()
+        {
+            base.Hit();
+            foreach (var i in routes)
+            {
+                i.TargetingSetActive(TowerKind.STRAIGHT, false);
+            }
+            isShoot = false;
+            EventManager.Instance.emit(EVENT_TYPE.TILE_HIT, this, TargetTile);
             Effect.gameObject.SetActive(true);
             Effect.Play();
-            isShoot = true;
+            StartCoroutine("PositionReset");
+        }
+        public void StraightTargeting(List<Tile> tiles)
+        {
+            routes = tiles;
         }
         #endregion
 
@@ -39,18 +51,19 @@ namespace MyIsland
         {
             if (this.TargetTile.tileData.isPlayerGround)
             {
-                transform.Translate(new Vector3(this.TargetTile.transform.position.x * 4f * Time.deltaTime, 0f, 0f), Space.World);
+                
+                transform.Translate(new Vector3((this.TargetTile.transform.position.x + 5f) * 2.5f * Time.deltaTime, 0f, 0f), Space.World);
+                
                 if (this.transform.position.x >= this.TargetTile.transform.position.x + 5f)
                 {
                     isShoot = false;
-                    // foreach (var i in routes)
-                    // {
-                    //     i.TileTargeting(false);
-                    // }
+                    foreach (var i in routes)
+                    {
+                        i.TargetingSetActive(TowerKind.STRAIGHT, false);
+                    }
                     this.transform.localPosition = new Vector3(0f, 0.5f, 0);
                     Effect.gameObject.SetActive(false);
                     Effect.Stop();
-
                 }
             }
             else
@@ -60,10 +73,10 @@ namespace MyIsland
                 {
 
                     isShoot = false;
-                    // foreach (var i in routes)
-                    // {
-                    //     i.TileTargeting(false);
-                    // }
+                    foreach (var i in routes)
+                    {
+                        i.TargetingSetActive(TowerKind.STRAIGHT, false);
+                    }
                     this.transform.localPosition = new Vector3(0f, 0.5f, 0);
                     Effect.gameObject.SetActive(false);
                     Effect.Stop();
