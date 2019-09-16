@@ -8,7 +8,7 @@ namespace MyIsland
     {
         public bool isPlayerGround;
         public int index;
-        public int hp;
+        public float hp;
         public TileState tileState;
         public MaterialState materialState;
 

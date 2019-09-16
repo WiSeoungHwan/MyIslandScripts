@@ -7,12 +7,21 @@ using UnityEngine;
 
 namespace MyIsland
 {
-    public enum UnitState{
+    public enum UnitState
+    {
         IDLE,
         MOVE,
         COLLECT,
         BUILD,
         HURT
+    }
+    public enum EnemyBuildingIndex{
+        NONE,
+        TOWER_1,
+        TOWER_2,
+        TOWER_3,
+        BUNKER,
+        TABLE
     }
     public class UnitControl : MonoBehaviour
     {
@@ -21,11 +30,15 @@ namespace MyIsland
         public delegate void Collect(MaterialState materialState, int clickTileIndex);
         public delegate void Build(Tile tile);
         public delegate void BuildTap(Tile tile);
+        public delegate void EnemyInput(int inputIndex);
+        public delegate void EnemyBuildingInput(EnemyBuildingIndex buildingIndex);
 
         private Move move = null;
         private Collect collect = null;
         private Build build = null;
         private BuildTap buildTap = null;
+        private EnemyInput enemyInput = null;
+        private EnemyBuildingInput enemyBuildingInput = null;
         #endregion
 
         #region Serialize Field
@@ -39,60 +52,123 @@ namespace MyIsland
         #endregion
 
         #region Public Methods
-        public void SetDelegate(Move move, Collect collect, Build build, BuildTap buildTap, bool isPlayerGround){
+        public void SetDelegate(Move move, Collect collect, Build build, BuildTap buildTap, bool isPlayerGround, EnemyInput enemyInput, EnemyBuildingInput enemyBuildingInput)
+        {
             this.move = move;
             this.collect = collect;
             this.build = build;
             this.buildTap = buildTap;
             this.isPlayerGround = isPlayerGround;
+            this.enemyInput = enemyInput;
+            this.enemyBuildingInput = enemyBuildingInput;
         }
 
-        public void BodyActive(bool active){
+        public void BodyActive(bool active)
+        {
             body.SetActive(active);
         }
         #endregion
 
         #region Private Methods
 
-        private void UnitAction(){
-        if(isPlayerGround){ /// 1p
-            if (Input.GetMouseButtonDown(0))
-            {
-                // get hitInfo
-                RaycastHit hitInfo;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hitInfo))
+        private void UnitAction()
+        {
+            if (isPlayerGround)
+            { /// 1p
+                if (Input.GetMouseButtonDown(0))
                 {
-                    if(hitInfo.transform.gameObject.GetComponent<Tile>()){// 타일 클릭했을때 
-                        Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
-                        if(!tile.tileData.isPlayerGround){return;}
-                        switch(tile.tileData.tileState){
-                            case TileState.NORMAL:
-                                move(tile.tileData.index);
-                                break;
-                            case TileState.MATERIAL:
-                                collect(tile.tileData.materialState, tile.tileData.index);
-                                break;
-                            case TileState.BUILDING:
-                                buildTap(tile);
-                                break;
-                            case TileState.WILL_BUILD:
-                                build(tile);
-                                break;
+                    // get hitInfo
+                    RaycastHit hitInfo;
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out hitInfo))
+                    {
+                        if (hitInfo.transform.gameObject.GetComponent<Tile>())
+                        {// 타일 클릭했을때 
+                            Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
+                            if (!tile.tileData.isPlayerGround) { return; }
+                            switch (tile.tileData.tileState)
+                            {
+                                case TileState.NORMAL:
+                                    move(tile.tileData.index);
+                                    break;
+                                case TileState.MATERIAL:
+                                    collect(tile.tileData.materialState, tile.tileData.index);
+                                    break;
+                                case TileState.BUILDING:
+                                    buildTap(tile);
+                                    break;
+                                case TileState.WILL_BUILD:
+                                    build(tile);
+                                    break;
+                            }
                         }
                     }
                 }
             }
-        }else{ // 2p
-            
+            else
+            { // 2p
+                EnemyInputIndex();
+            }
+
         }
-            
+
+        #endregion
+
+        #region Enemy Methods
+        private void EnemyInputIndex()
+        {
+            int inputIndex = 0;
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                inputIndex = -5;
+            }
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                inputIndex = 5;
+            }
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                inputIndex = 1;
+                
+            }
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                inputIndex = -1;
+            }
+            enemyInput(inputIndex);
+            EnemyBuildingIndex buildingIndex = EnemyBuildingIndex.NONE;
+            if (Input.GetKeyDown("`")){
+                buildingIndex = EnemyBuildingIndex.NONE;
+                enemyBuildingInput(buildingIndex);
+            }
+            else if (Input.GetKeyDown("1")){
+                buildingIndex = EnemyBuildingIndex.TOWER_1;
+                enemyBuildingInput(buildingIndex);
+            }
+                
+            else if (Input.GetKeyDown("2")){
+                buildingIndex = EnemyBuildingIndex.TOWER_2;
+                enemyBuildingInput(buildingIndex);
+            }
+            else if (Input.GetKeyDown("3")){
+                buildingIndex = EnemyBuildingIndex.TOWER_3;
+                enemyBuildingInput(buildingIndex);
+            }
+            else if (Input.GetKeyDown("4")){
+                buildingIndex = EnemyBuildingIndex.BUNKER;
+                enemyBuildingInput(buildingIndex);
+            }
+            else if (Input.GetKeyDown("5")){
+                buildingIndex = EnemyBuildingIndex.TABLE;
+                enemyBuildingInput(buildingIndex);
+            }
+                
         }
-        
         #endregion
 
         #region MonoBehaviour CallBacks
-        void Update(){
+        void Update()
+        {
             UnitAction();
         }
         #endregion

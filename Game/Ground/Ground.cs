@@ -26,8 +26,8 @@ namespace MyIsland
         public void GroundInit(bool isPlayerGround, GameObject[] selectedTheme, MaterialInitData materialInitData)
         {
             this.isPlayerGround = isPlayerGround;
-            TileSort(materialInitData,selectedTheme);
-            EventManager.Instance.on(EVENT_TYPE.TOWER_FIRE,TileTargeting);
+            TileSort(materialInitData, selectedTheme);
+            EventManager.Instance.on(EVENT_TYPE.TOWER_FIRE, TileTargeting);
         }
 
         public Tile GetTile(int index)
@@ -61,28 +61,61 @@ namespace MyIsland
                 case TowerKind.PARABOLA:
                     Tile tile = GetTile(RandomNum(towerData.tileIndex));
                     tower.Targeting(tile);
-                    break; 
+                    break;
                 case TowerKind.STRAIGHT:
-                    tile = GetTile(isPlayerGround ? tower.TowerData.tileIndex % 5: tower.TowerData.tileIndex % 5 + 20);
+                    tile = GetTile(isPlayerGround ? tower.TowerData.tileIndex % 5 : tower.TowerData.tileIndex % 5 + 20);
                     tower.Targeting(tile);
                     List<Tile> routes = new List<Tile>();
-                for (int i = 0; i < 5; ++i)
-                {
-                    Tile route;
-                    if (isPlayerGround)
+                    for (int i = 0; i < 5; ++i)
                     {
-                        route = tileList[tile.tileData.index + 5 * i];
+                        Tile route;
+                        if (isPlayerGround)
+                        {
+                            route = tileList[tile.tileData.index + 5 * i];
+                        }
+                        else
+                        {
+                            route = tileList[(tile.tileData.index % 5) + 5 * i];
+                        }
+                        route.TargetingSetActive(TowerKind.STRAIGHT, true);
+                        routes.Add(route);
                     }
-                    else
-                    {
-                        route = tileList[(tile.tileData.index % 5) + 5 * i];
-                    }
-                    route.TargetingSetActive(TowerKind.STRAIGHT,true);
-                    routes.Add(route);
-                    }
-                    
+                    tower.StraightTargeting(routes);
                     break;
                 case TowerKind.SCOPE:
+                    tile = GetTile(RandomNum(towerData.tileIndex));
+                    int destinationIndex = tile.tileData.index;
+                    List<int> scopeIndex = new List<int>();
+
+                    scopeIndex.Add(destinationIndex);
+                    scopeIndex.Add(destinationIndex + 1);
+                    scopeIndex.Add(destinationIndex - 1);
+                    scopeIndex.Add(destinationIndex + 5);
+                    scopeIndex.Add(destinationIndex - 5);
+                    if (destinationIndex == 4 || ((destinationIndex - 4) % 5) == 0)
+                    {
+                        scopeIndex.Remove(destinationIndex + 1);
+                    }
+                    if (destinationIndex == 0 || destinationIndex % 5 == 0)
+                    {
+                        scopeIndex.Remove(destinationIndex - 1);
+                    }
+                    if (destinationIndex + 5 > 24)
+                    {
+                        scopeIndex.Remove(destinationIndex + 5);
+                    }
+                    if (destinationIndex - 5 < 0)
+                    {
+                        scopeIndex.Remove(destinationIndex - 5);
+                    }
+
+                    List<Tile> scopes = new List<Tile>();
+                    foreach (var i in scopeIndex)
+                    {
+                        scopes.Add(GetTile(i));
+                    }
+                    tower.ScopeTargeting(scopes);
+                    tower.Targeting(tile);
                     break;
             }
         }
@@ -129,14 +162,14 @@ namespace MyIsland
         }
 
 
-        private void GroundInstance(GameObject selectedTheme,Tile tile)
+        private void GroundInstance(GameObject selectedTheme, Tile tile)
         {
             // 그라운드 인스턴스 
-            GameObject ground = Instantiate(selectedTheme,  tile.transform.position, Quaternion.identity);
+            GameObject ground = Instantiate(selectedTheme, tile.transform.position, Quaternion.identity);
             ground.transform.SetParent(tile.transform);
             ground.SetActive(true);
         }
-        private void TileSort(MaterialInitData initData,GameObject[] selectedTheme)
+        private void TileSort(MaterialInitData initData, GameObject[] selectedTheme)
         {
             int index = 0;
             List<int> tileSponeIndex = new List<int>() { 0, 1, 2, 4, 9, 14, 22, 23, 24, 10, 15, 20 };
@@ -145,7 +178,7 @@ namespace MyIsland
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    int ran = Random.Range(0,selectedTheme.Length);
+                    int ran = Random.Range(0, selectedTheme.Length);
                     Vector3 pos = new Vector3(i + transform.position.x, 0.35f, j);
                     Tile tile = TileLoad(pos);
                     GroundInstance(selectedTheme[ran], tile);

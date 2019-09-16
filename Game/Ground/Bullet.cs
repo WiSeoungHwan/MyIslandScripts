@@ -39,19 +39,25 @@ namespace MyIsland
         #region Serialize Field
         [SerializeField]
         private ParticleSystem _effect;
+        [SerializeField]
+        private GameObject _body;
         #endregion
 
         #region Public Methods
         public virtual void Fire(){
-            
+            _body.SetActive(true);
         }
-        public void Targeting(Tile tile, float damage,TowerKind towerKind){
+        public virtual void Hit(){
+            _body.SetActive(false);
+        }
+        public void Targeting(Tile tile, float damage,TowerKind towerKind, string tag){
+            this.tag = tag;
             _targetTile = tile;
             this._damage = damage;
             _towerKind = towerKind;
             Fire();
         }
-
+        
         
         #endregion
     }

@@ -43,7 +43,16 @@ namespace MyIsland
         
         #region Public Methods
         public void Targeting(Tile tile){
-            bullet.Targeting(tile,TowerData.towerDamage,this.TowerData.towerKind);
+            var tag = TowerData.isPlayerGround ? "EnemyPlayer" : "Player";
+            bullet.Targeting(tile,TowerData.towerDamage,this.TowerData.towerKind, tag);
+        }
+        public void StraightTargeting(List<Tile> tiles){
+            WoodStraight straight = (WoodStraight)bullet;
+            straight.StraightTargeting(tiles);
+        }
+        public void ScopeTargeting(List<Tile> tiles){
+            WoodScope scope = (WoodScope)bullet;
+            scope.ScopeTargeting(tiles);
         }
         public void Fire(EVENT_TYPE eventType, Component sender, object param = null){
             if(BuildComplete == false){return;}

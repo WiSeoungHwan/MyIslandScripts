@@ -26,7 +26,7 @@ namespace MyIsland
         public void SetDelegate(UpgradeButtonTap upgradeButtonTap){
             this.upgradeButtonTap = upgradeButtonTap;
         }
-        public void TileUIUpdate(int hp){
+        public void TileUIUpdate(float hp){
             hpText.text = hp.ToString();
         }
 
