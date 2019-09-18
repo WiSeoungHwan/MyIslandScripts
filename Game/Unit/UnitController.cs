@@ -41,6 +41,9 @@ namespace MyIsland
                 unitHp = unitInitData.unitHp,
                 unitMaxHp = unitInitData.unitHp,
                 unitDemage = unitInitData.unitDemage,
+                maxStamina = unitInitData.maxStamina,
+                stamina = unitInitData.stamina,
+                staminaCoolTime = unitInitData.staminaCoolTime,
                 tableCount = 0,
                 unitMaterial = new UnitMaterialData()
             };
@@ -48,6 +51,7 @@ namespace MyIsland
             unitControl.transform.position = ReturnMovePos(unitData.unitIndex);
 
             // 유닛 HUD 초기화
+            unitUI.SetDelegate(UnitStaminaUp);
             unitUI.UnitUIUpdate(unitData);
 
             // 델리게이트 설정
@@ -68,19 +72,41 @@ namespace MyIsland
         #endregion
 
         #region Private Methods
+        private void UnitStaminaCount(){
+            if(unitData.stamina <= 0){
+                unitData.stamina = 0;
+            }else{
+                unitData.stamina -= 1;
+            }
+            unitUI.UnitStaminaDiscount(unitData.stamina);
+        }
+        private int UnitStaminaUp(){
+            if(unitData.stamina < 5){
+                unitData.stamina++;
+            }else{
+                unitData.stamina = 5;
+            }
+            return unitData.stamina;
+        }
+        private bool isHasStamina(){
+            return unitData.stamina > 0 ? true : false; 
+        }
 
         // 행동 관련
         private void Move(int clickTileIndex)  // 플레이어가 노멀타일을 클릭하면 들어오는 함수 클릭한 타일의 인덱스가 들어옴 
         {
             if (!isNearTile(clickTileIndex)) { return; }
+            if(!isHasStamina()){return;}
             unitControl.BodyActive(true);
             onBunker = false;
             unitControl.transform.position = ReturnMovePos(clickTileIndex);
             unitData.unitIndex = clickTileIndex;
+            UnitStaminaCount();
         }
         private void Collect(MaterialState materialState, int clickTileIndex)
         { // 플레이어가 자원 타일을 클릭하면 들어오는 함수 
             if (!isNearTile(clickTileIndex) || onBunker) { return; }
+            if(!isHasStamina()){return;}
             if (ground.GetTile(clickTileIndex).TileHurt(unitData.unitDemage) == false) { return; }
             switch (materialState)
             {
@@ -105,10 +131,12 @@ namespace MyIsland
             {
                 EventManager.Instance.emit(EVENT_TYPE.ENEMYMATERAIL_COLLECT, this, unitData.unitMaterial);
             }
+            UnitStaminaCount();
         }
         private void Build(Tile tile)
         {
             if (onBunker) { return; }
+            if(!isHasStamina()){return;}
             foreach (var i in NearTileList(unitData.unitIndex))
             {
                 Tile nearTile = ground.GetTile(i);
@@ -191,10 +219,12 @@ namespace MyIsland
                 }
                 nearTile.BuildOff();
             }
+            UnitStaminaCount();
         }
 
         private void BuildTap(Tile tile)
         {
+            if (isNearTile(tile.tileData.index) == false){return;}
             switch (tile.GetBuildingKind())
             {
                 case BuildingKind.TABLE:
@@ -347,6 +377,7 @@ namespace MyIsland
             if (unitData.unitHp <= 0)
             {
                 unitData.unitHp = 0;
+                EventManager.Instance.emit(EVENT_TYPE.GAMEOVER_UNIT_DIE,this,isPlayer);
             }
             unitUI.UnitUIUpdate(unitData);
         }
@@ -496,7 +527,6 @@ namespace MyIsland
                     return;
                 }
             }
-
             switch (buildingIndex)
             {
                 case EnemyBuildingIndex.TOWER_1:
@@ -519,6 +549,13 @@ namespace MyIsland
                     break;
             }
         }
+        #endregion
+
+        #region Stamina
+        private void StaminaUpdate(){
+
+        }
+        
         #endregion
     }
 

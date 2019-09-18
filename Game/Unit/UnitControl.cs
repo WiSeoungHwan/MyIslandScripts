@@ -86,6 +86,7 @@ namespace MyIsland
                         {// 타일 클릭했을때 
                             Tile tile = hitInfo.transform.gameObject.GetComponent<Tile>();
                             if (!tile.tileData.isPlayerGround) { return; }
+                            body.transform.LookAt(new Vector3(tile.transform.position.x,1f,tile.transform.position.z));
                             switch (tile.tileData.tileState)
                             {
                                 case TileState.NORMAL:
@@ -110,6 +111,10 @@ namespace MyIsland
                 EnemyInputIndex();
             }
 
+        }
+
+        private void BodyRotate(Vector3 pos){
+            // if(pos.x < this.transform.lo)
         }
 
         #endregion

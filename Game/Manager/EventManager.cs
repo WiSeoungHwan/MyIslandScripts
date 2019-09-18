@@ -14,7 +14,9 @@ public enum EVENT_TYPE {
     TOWER_FIRE,
     GM_FIRE,
     TILE_HIT,
-    ARROW_HIT
+    ARROW_HIT,
+    GAMEOVER_UNIT_DIE,
+    GAMEOVER_TIMEOUT
     
 }
 

@@ -103,8 +103,7 @@ namespace MyIsland
                 {
                     targetingMark[(int)i.Key].SetActive(false);
                 }
-                Debug.Log(i.Key);
-                Debug.Log(i.Value);
+
             }
 
         }
@@ -194,9 +193,10 @@ namespace MyIsland
         }
 
 
-        public bool TileHurt(int demage)
+        public bool TileHurt(float demage)
         {
-            if (tileData.hp <= 0)
+            tileData.hp -= demage;
+            if (tileData.hp < 1)
             {
                 switch (tileData.tileState)
                 {
@@ -229,7 +229,6 @@ namespace MyIsland
                 tileUI.TileUISetActive(false);
                 return false;
             }
-            tileData.hp -= demage;
             tileUI.TileUIUpdate(tileData.hp);
             return true;
         }
