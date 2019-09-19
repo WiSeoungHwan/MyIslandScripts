@@ -32,6 +32,7 @@ namespace MyIsland
         public delegate void BuildTap(Tile tile);
         public delegate void EnemyInput(int inputIndex);
         public delegate void EnemyBuildingInput(EnemyBuildingIndex buildingIndex);
+        public delegate void EnemyLevelUp();
 
         private Move move = null;
         private Collect collect = null;
@@ -39,6 +40,7 @@ namespace MyIsland
         private BuildTap buildTap = null;
         private EnemyInput enemyInput = null;
         private EnemyBuildingInput enemyBuildingInput = null;
+        private EnemyLevelUp enemyLevelUp = null;
         #endregion
 
         #region Serialize Field
@@ -52,7 +54,7 @@ namespace MyIsland
         #endregion
 
         #region Public Methods
-        public void SetDelegate(Move move, Collect collect, Build build, BuildTap buildTap, bool isPlayerGround, EnemyInput enemyInput, EnemyBuildingInput enemyBuildingInput)
+        public void SetDelegate(Move move, Collect collect, Build build, BuildTap buildTap, bool isPlayerGround, EnemyInput enemyInput, EnemyBuildingInput enemyBuildingInput,EnemyLevelUp enemyLevelUp)
         {
             this.move = move;
             this.collect = collect;
@@ -61,6 +63,7 @@ namespace MyIsland
             this.isPlayerGround = isPlayerGround;
             this.enemyInput = enemyInput;
             this.enemyBuildingInput = enemyBuildingInput;
+            this.enemyLevelUp = enemyLevelUp;
         }
 
         public void BodyActive(bool active)
@@ -166,6 +169,9 @@ namespace MyIsland
             else if (Input.GetKeyDown("5")){
                 buildingIndex = EnemyBuildingIndex.TABLE;
                 enemyBuildingInput(buildingIndex);
+            }
+            if(Input.GetKeyDown(KeyCode.Q)){
+                enemyLevelUp();
             }
                 
         }

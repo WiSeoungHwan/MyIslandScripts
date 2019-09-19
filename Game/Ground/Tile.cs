@@ -185,6 +185,7 @@ namespace MyIsland
 
         public void UpgradeTable(int key)
         {
+            if(onBuildingObject.buildingKind != BuildingKind.TABLE){return;}
             TableObjectPool.Instance.Remove((TablePoolList)key - 1, onBuildingObject.gameObject);
             var obj = TableObjectPool.Instance.Pop((TablePoolList)key).GetComponent<Building>();
             WillBuildSetup(key, obj);
@@ -254,7 +255,6 @@ namespace MyIsland
             this.onBuildingObject = onBuildingObject;
             this.onBuildingObject.gameObject.SetActive(true);
             this.onBuildingObject.transform.position = new Vector3(willBuildObject.transform.position.x, 1f, willBuildObject.transform.position.z);
-
             this.key = (int)key;
             tileData.tileState = TileState.WILL_BUILD;
         }

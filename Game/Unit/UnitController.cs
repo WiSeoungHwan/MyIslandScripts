@@ -56,7 +56,7 @@ namespace MyIsland
 
             // 델리게이트 설정
 
-            unitControl.SetDelegate(Move, Collect, Build, BuildTap, isPlayer, EnemyAction, EnemyBuildAction);
+            unitControl.SetDelegate(Move, Collect, Build, BuildTap, isPlayer, EnemyAction, EnemyBuildAction, EnemyLevelUp);
             // 이벤트 리스너 등록
             if (isPlayer)
             {
@@ -67,36 +67,53 @@ namespace MyIsland
             }
 
             EventManager.Instance.on(EVENT_TYPE.TILE_HIT, IsPlayerHit);
-            EventManager.Instance.on(EVENT_TYPE.TABLE_BROKEN,TableBroken);
+            EventManager.Instance.on(EVENT_TYPE.TABLE_BROKEN, TableBroken);
         }
         #endregion
 
         #region Private Methods
-        private void UnitStaminaCount(){
-            if(unitData.stamina <= 0){
+        private void UnitStaminaCount()
+        {
+            if (unitData.stamina <= 0)
+            {
                 unitData.stamina = 0;
-            }else{
+                if(isPlayer)
+                    unitUI.ShowMessege("스테미너가 부족합니다.");
+            }
+            else
+            {
                 unitData.stamina -= 1;
             }
             unitUI.UnitStaminaDiscount(unitData.stamina);
         }
-        private int UnitStaminaUp(){
-            if(unitData.stamina < 5){
+        private int UnitStaminaUp()
+        {
+            if (unitData.stamina < 5)
+            {
                 unitData.stamina++;
-            }else{
+            }
+            else
+            {
                 unitData.stamina = 5;
             }
             return unitData.stamina;
         }
-        private bool isHasStamina(){
-            return unitData.stamina > 0 ? true : false; 
+        private bool isHasStamina()
+        {
+            return unitData.stamina > 0 ? true : false;
         }
 
         // 행동 관련
         private void Move(int clickTileIndex)  // 플레이어가 노멀타일을 클릭하면 들어오는 함수 클릭한 타일의 인덱스가 들어옴 
         {
             if (!isNearTile(clickTileIndex)) { return; }
-            if(!isHasStamina()){return;}
+            if (!isHasStamina())
+            {
+                if(isPlayer)
+                    unitUI.ShowMessege("스테미너가 부족합니다.");
+                unitUI.UnitStaminaDiscount(unitData.stamina);
+                return;
+            }
             unitControl.BodyActive(true);
             onBunker = false;
             unitControl.transform.position = ReturnMovePos(clickTileIndex);
@@ -106,7 +123,13 @@ namespace MyIsland
         private void Collect(MaterialState materialState, int clickTileIndex)
         { // 플레이어가 자원 타일을 클릭하면 들어오는 함수 
             if (!isNearTile(clickTileIndex) || onBunker) { return; }
-            if(!isHasStamina()){return;}
+            if (!isHasStamina())
+            {
+                if(isPlayer)
+                    unitUI.ShowMessege("스테미너가 부족합니다.");
+                unitUI.UnitStaminaDiscount(unitData.stamina);
+                return;
+            }
             if (ground.GetTile(clickTileIndex).TileHurt(unitData.unitDemage) == false) { return; }
             switch (materialState)
             {
@@ -136,14 +159,18 @@ namespace MyIsland
         private void Build(Tile tile)
         {
             if (onBunker) { return; }
-            if(!isHasStamina()){return;}
+            if (!isHasStamina())
+            {
+                unitUI.UnitStaminaDiscount(unitData.stamina);
+                return;
+            }
+            bool hasMaterial = false;
             foreach (var i in NearTileList(unitData.unitIndex))
             {
                 Tile nearTile = ground.GetTile(i);
                 if (nearTile.tileData.tileState != TileState.WILL_BUILD) { continue; }
                 if (tile.tileData.index == nearTile.tileData.index)
                 {
-                    bool hasMaterial = false;
 
                     switch (unitData.unitLevel)
                     {
@@ -219,12 +246,15 @@ namespace MyIsland
                 }
                 nearTile.BuildOff();
             }
-            UnitStaminaCount();
+            if (hasMaterial)
+                UnitStaminaCount();
+            else
+                unitUI.ShowMessege("자원이 부족합니다.");
         }
 
         private void BuildTap(Tile tile)
         {
-            if (isNearTile(tile.tileData.index) == false){return;}
+            if (isNearTile(tile.tileData.index) == false) { return; }
             switch (tile.GetBuildingKind())
             {
                 case BuildingKind.TABLE:
@@ -267,7 +297,8 @@ namespace MyIsland
                         }
                         else
                         {
-                            Debug.Log("업그레이드 자원부족");
+                            if(isPlayer)
+                                unitUI.ShowMessege("업그레이드 자원부족");
                         }
                     });
                     break;
@@ -363,11 +394,13 @@ namespace MyIsland
             }
         }
 
-        private void TableBroken(EVENT_TYPE eventType, Component sender, object param = null){
+        private void TableBroken(EVENT_TYPE eventType, Component sender, object param = null)
+        {
             Tile tile = (Tile)sender;
-            if(tile.tileData.isPlayerGround == isPlayer){
+            if (tile.tileData.isPlayerGround == isPlayer)
+            {
                 unitData.tableCount--;
-                if(isPlayer)
+                if (isPlayer)
                     EventManager.Instance.emit(EVENT_TYPE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
             }
         }
@@ -377,7 +410,7 @@ namespace MyIsland
             if (unitData.unitHp <= 0)
             {
                 unitData.unitHp = 0;
-                EventManager.Instance.emit(EVENT_TYPE.GAMEOVER_UNIT_DIE,this,isPlayer);
+                EventManager.Instance.emit(EVENT_TYPE.GAMEOVER_UNIT_DIE, this, isPlayer);
             }
             unitUI.UnitUIUpdate(unitData);
         }
@@ -439,7 +472,8 @@ namespace MyIsland
             switch (unitData.unitLevel)
             {
                 case 0:
-                    Debug.Log("Player Level is 0");
+                    if(isPlayer)
+                        unitUI.ShowMessege("작업대를 지어주세요.");
                     break;
                 case 1:
                     playerLevelTower = (0, 1, 2);
@@ -496,6 +530,56 @@ namespace MyIsland
         #endregion
 
         #region Enemy Action
+        private void EnemyLevelUp()
+        {
+            var tiles = NearTileList(unitData.unitIndex);
+            bool isLevelUp = false;
+            foreach (var i in tiles)
+            {
+                var tile = ground.GetTile(i);
+                if (tile.tileData.tileState == TileState.BUILDING)
+                {
+                    if (tile.GetBuildingKind() == BuildingKind.TABLE)
+                    {
+                        bool hasMaterial = false;
+
+                        switch (unitData.unitLevel)
+                        {
+                            case 1:
+                                if (unitData.unitMaterial.wood >= 10)
+                                {
+                                    hasMaterial = true;
+                                    unitData.unitMaterial.wood -= 10;
+                                }
+                                break;
+                            case 2:
+                                if (unitData.unitMaterial.stone >= 10)
+                                {
+                                    hasMaterial = true;
+                                    unitData.unitMaterial.stone -= 10;
+                                }
+                                break;
+                            case 3:
+                                if (unitData.unitMaterial.iron >= 10)
+                                {
+                                    hasMaterial = true;
+                                    unitData.unitMaterial.iron -= 10;
+                                }
+                                break;
+
+                        }
+                        if(hasMaterial){
+                            tile.UpgradeTable(unitData.unitLevel);
+                            isLevelUp = true;
+                        }
+                        
+                    }
+                }
+
+            }
+            if (isLevelUp)
+                unitData.unitLevel = unitData.unitLevel >= 3 ? 3 : unitData.unitLevel + 1;
+        }
         private void EnemyAction(int inputIndex)
         {
             var curIndex = unitData.unitIndex + inputIndex;
@@ -549,13 +633,6 @@ namespace MyIsland
                     break;
             }
         }
-        #endregion
-
-        #region Stamina
-        private void StaminaUpdate(){
-
-        }
-        
         #endregion
     }
 
