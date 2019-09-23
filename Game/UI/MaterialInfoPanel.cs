@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public class MaterialInfoPanel : MonoBehaviour
     {
@@ -24,17 +24,17 @@ namespace MyIsland
         void Start()
         {
             Debug.Log("Panel Start");
-            EventManager.Instance.on(EVENT_TYPE.MATERIAL_COLLECT, UnitMaterialDataUpdate);
+            EventManager.Instance.on(EVENT_TYPE_SINGLE.MATERIAL_COLLECT, UnitMaterialDataUpdate);
         }
 
         void OnDestroy()
         {
-            EventManager.Instance.off(EVENT_TYPE.MATERIAL_COLLECT, UnitMaterialDataUpdate);
+            EventManager.Instance.off(EVENT_TYPE_SINGLE.MATERIAL_COLLECT, UnitMaterialDataUpdate);
         }
         #endregion
 
         #region Public Methods
-        public void UnitMaterialDataUpdate(EVENT_TYPE eventType, Component sender, object param = null)
+        public void UnitMaterialDataUpdate(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
         {
             UnitMaterialData data = (UnitMaterialData)param;
             woodText.text = data.wood.ToString();

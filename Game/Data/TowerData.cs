@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public enum TowerKind{
         PARABOLA,

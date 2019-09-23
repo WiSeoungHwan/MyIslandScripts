@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
 
     public class MaterialInitData

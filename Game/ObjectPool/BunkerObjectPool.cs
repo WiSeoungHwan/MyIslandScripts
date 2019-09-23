@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public enum BunkerPoolList{
         BUNKER_1,BUNKER_2,BUNKER_3,BUNKER_4

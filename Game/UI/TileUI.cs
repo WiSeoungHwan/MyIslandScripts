@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public delegate void UpgradeButtonTap();
 

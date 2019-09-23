@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public class WoodScope : Bullet
     {
@@ -81,7 +81,7 @@ namespace MyIsland
                 {
                     i.TileHurt(1);
                 }
-                EventManager.Instance.emit(EVENT_TYPE.TILE_HIT,this, i);
+                EventManager.Instance.emit(EVENT_TYPE_SINGLE.TILE_HIT,this, i);
             }
 
             

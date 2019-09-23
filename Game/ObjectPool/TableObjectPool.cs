@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public enum TablePoolList
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public class UnitUI : MonoBehaviour
     {
@@ -80,7 +80,7 @@ namespace MyIsland
         IEnumerator StaminaCoolTime()
         {
             yield return new WaitForSeconds(0.01f);
-            coolTime += 0.002f;
+            coolTime += 0.005f;
             if(coolTime >= 0.2f){
                 unitStaminaImage.fillAmount = staminaUp() * 0.2f;
                 coolTime = 0f;

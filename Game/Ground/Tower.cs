@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public enum TowerEnum{
         TOWER_1,
@@ -36,7 +36,7 @@ namespace MyIsland
         #region MonoBehaviour CallBack
         void Start(){
             BuildComplete = false;
-            EventManager.Instance.on(EVENT_TYPE.GM_FIRE,Fire);
+            EventManager.Instance.on(EVENT_TYPE_SINGLE.GM_FIRE,Fire);
             this.buildingKind = BuildingKind.TOWER;
         }
         #endregion
@@ -54,9 +54,9 @@ namespace MyIsland
             WoodScope scope = (WoodScope)bullet;
             scope.ScopeTargeting(tiles);
         }
-        public void Fire(EVENT_TYPE eventType, Component sender, object param = null){
+        public void Fire(EVENT_TYPE_SINGLE eventType, Component sender, object param = null){
             if(BuildComplete == false){return;}
-            EventManager.Instance.emit(EVENT_TYPE.TOWER_FIRE,this);
+            EventManager.Instance.emit(EVENT_TYPE_SINGLE.TOWER_FIRE,this);
         }
         public void TowerInit(bool isPlayerGround, int tileIndex){
             this.TowerData.isPlayerGround = isPlayerGround;

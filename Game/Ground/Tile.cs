@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     public enum TileState
     {
@@ -211,7 +211,7 @@ namespace MyIsland
                             switch (onBuildingObject.buildingKind)
                             {
                                 case BuildingKind.TABLE:
-                                    EventManager.Instance.emit(EVENT_TYPE.TABLE_BROKEN,this);
+                                    EventManager.Instance.emit(EVENT_TYPE_SINGLE.TABLE_BROKEN,this);
                                     TableObjectPool.Instance.Remove((TablePoolList)key, onBuildingObject.gameObject);
                                     break;
                                 case BuildingKind.TOWER:

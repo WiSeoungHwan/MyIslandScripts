@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyIsland
+namespace MyIsland_InGame
 {
     [Serializable]    
     public class MaterialInitCount
