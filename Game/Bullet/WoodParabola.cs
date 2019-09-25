@@ -26,7 +26,7 @@ namespace MyIsland_InGame
                 Effect.gameObject.SetActive(true);
                 Effect.transform.position = new Vector3(transform.position.x, 1f, transform.position.z);
                 Effect.Play();
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.TILE_HIT,this,TargetTile);
+                EventManager.Instance.emit(EVENT_TYPE.TILE_HIT,this,TargetTile);
                 StartCoroutine("PositionReset");
             });
         }

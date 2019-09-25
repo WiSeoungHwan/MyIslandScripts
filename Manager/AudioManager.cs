@@ -1,58 +1,60 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 
-public class AudioManager : MonoBehaviour
+public class AudioManager : DontDestroy<AudioManager>
 {
-    
-    public static AudioManager Instance
-    {
-        get { return instance; }
-    }
-    private static AudioManager instance = null;
+
     [SerializeField]
 	private AudioSource sfxSouce = null;
     [SerializeField]
 	private AudioSource bgmSouce = null;
 
-    private string[] bgmList = {"happy_pirate_accordion"};
-    private string[] sfxList = {"button"};
+    [SerializeField]
+    private AudioClip[] audioClip;
+    private Dictionary<string, AudioClip> audioClipsDic;
     
     // private bool mute = false;
-    protected void Awake()
-    {
-		if(instance == null)
-		{
-            instance = this;
-		}
-        else
-        {
-			DestroyImmediate(gameObject);
+
+
+    #region MonoBehaviour
+    protected override void OnAwake(){
+        audioClipsDic = new Dictionary<string, AudioClip>();
+        foreach(AudioClip a in audioClip){
+            audioClipsDic.Add(a.name,a);
         }
     }
-    public void PlaySfx(SFX _sfxType)
+    #endregion
+    public void PlaySfx(string audioName,float volume = 1f)
     {
-        int sfxNumber = (int)_sfxType;
-
-        AudioClip audioClip = Resources.Load("Sfx/" + this.sfxList[sfxNumber], typeof(AudioClip)) as AudioClip;
-        this.sfxSouce.clip = audioClip;
-        this.sfxSouce.PlayOneShot(audioClip);
+        if (audioClipsDic.ContainsKey(audioName) == false)
+        {
+            Debug.Log(audioName + " is not Contained audioClipsDic");
+            return;
+        }
+        this.sfxSouce.volume = volume;
+        this.sfxSouce.PlayOneShot(audioClipsDic[audioName], volume);
     }
 
-    public void PlayBgm(BGM _bgmNumber)
+    public void PlayBgm(string audioName, float volume = 0.3f)
 	{
-        int bgmNumber = (int)_bgmNumber;
-        AudioClip audioClip = Resources.Load("Bgm/" + this.bgmList[bgmNumber]) as AudioClip;
-        this.bgmSouce.clip = audioClip;
+        if (audioClipsDic.ContainsKey(audioName) == false)
+        {
+            Debug.Log(audioName + " is not Contained audioClipsDic");
+            return;
+        }
+        this.bgmSouce.clip = audioClipsDic[audioName];
+        this.bgmSouce.volume = volume;
+        this.bgmSouce.loop = true;
         this.bgmSouce.Play();
 	}
-	private void stopSound(EVENT_TYPE eventType, Component sender, object value = null)
+	public void StopBGM()
 	{
+        this.bgmSouce.Stop();
 	}
 
-    private void onMute(EVENT_TYPE eventType, Component sender, object value = null)
+    private void OnMute()
     {
         // this.mute = !this.mute;
         // AudioListener.volume = this.mute ? 0 : 1;

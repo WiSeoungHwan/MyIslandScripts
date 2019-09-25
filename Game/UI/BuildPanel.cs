@@ -29,7 +29,7 @@ namespace MyIsland_InGame
         #region MonoBehaviour CallBack
         void Start()
         {
-            EventManager.Instance.on(EVENT_TYPE_SINGLE.TABLE_COUNT_CHANGE, TableCountChange);
+            EventManager.Instance.on(EVENT_TYPE.TABLE_COUNT_CHANGE, TableCountChange);
             bunkerButton.gameObject.SetActive(false);
             parabolaButton.gameObject.SetActive(false);
             straightButton.gameObject.SetActive(false);
@@ -37,12 +37,12 @@ namespace MyIsland_InGame
         }
         void OnDestory()
         {
-            EventManager.Instance.off(EVENT_TYPE_SINGLE.TABLE_COUNT_CHANGE, TableCountChange);
+            EventManager.Instance.off(EVENT_TYPE.TABLE_COUNT_CHANGE, TableCountChange);
         }
         #endregion
 
         #region Private Methods
-        private void TableCountChange(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void TableCountChange(EVENT_TYPE eventType, Component sender, object param = null)
         {
             int tableCount = (int)param;
             bool active = false;
@@ -66,12 +66,12 @@ namespace MyIsland_InGame
         {
             if (currentBuiding == building)
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.WILL_BUILD_OFF, this);
+                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
                 currentBuiding = 5;
             }
             else
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.TOWER_WILL_BUILD, this, (TowerEnum)building);
+                EventManager.Instance.emit(EVENT_TYPE.TOWER_WILL_BUILD, this, (TowerEnum)building);
                 currentBuiding = building;
             }
         }
@@ -79,12 +79,12 @@ namespace MyIsland_InGame
         {
             if (currentBuiding == building)
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.WILL_BUILD_OFF, this);
+                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
                 currentBuiding = 5;
             }
             else
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.TABLE_WILL_BUILD, this);
+                EventManager.Instance.emit(EVENT_TYPE.TABLE_WILL_BUILD, this);
                 currentBuiding = building;
             }
         }
@@ -92,12 +92,12 @@ namespace MyIsland_InGame
         {
             if (currentBuiding == building)
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.WILL_BUILD_OFF, this);
+                EventManager.Instance.emit(EVENT_TYPE.WILL_BUILD_OFF, this);
                 currentBuiding = 5;
             }
             else
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.BUNKER_WILL_BUILD, this);
+                EventManager.Instance.emit(EVENT_TYPE.BUNKER_WILL_BUILD, this);
                 currentBuiding = building;
             }
         }

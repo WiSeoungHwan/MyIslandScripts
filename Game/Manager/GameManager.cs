@@ -56,14 +56,15 @@ namespace MyIsland_InGame
         protected override void OnStart()
         {
             GameInit();
-            
-            EventManager.Instance.on(EVENT_TYPE_SINGLE.GAMEOVER_UNIT_DIE, GameOverUnitDie);
+            AudioManager.Instance.PlayBgm("Game_01");
+            EventManager.Instance.on(EVENT_TYPE.GAMEOVER_UNIT_DIE, GameOverUnitDie);
             gameoverPanel.SetActive(false);
             towerFireTime = fireTime;
             curTime = playTime;
         }
         void OnDestroy(){
-            EventManager.Instance.off(EVENT_TYPE_SINGLE.GAMEOVER_UNIT_DIE, GameOverUnitDie);
+            EventManager.Instance.off(EVENT_TYPE.GAMEOVER_UNIT_DIE, GameOverUnitDie);
+            AudioManager.Instance.StopBGM();
         }
         #endregion
 
@@ -142,7 +143,7 @@ namespace MyIsland_InGame
             if (towerFireTime <= 0)
             {
                 towerFireTime = fireTime;
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.GM_FIRE, this);
+                EventManager.Instance.emit(EVENT_TYPE.GM_FIRE, this);
             }
             if(curTime < 1){
                 gameoverPanel.SetActive(true);
@@ -155,7 +156,7 @@ namespace MyIsland_InGame
         #endregion
 
         #region Private Method
-        private void GameOverUnitDie(EVENT_TYPE_SINGLE eventType, Component sender, object param = null){
+        private void GameOverUnitDie(EVENT_TYPE eventType, Component sender, object param = null){
             bool isPlayer = (bool)param;
             gameoverPanel.SetActive(true);
         }

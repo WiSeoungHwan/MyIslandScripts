@@ -38,7 +38,7 @@ namespace MyIsland_InGame
                 i.TargetingSetActive(TowerKind.STRAIGHT, false);
             }
             isShoot = false;
-            EventManager.Instance.emit(EVENT_TYPE_SINGLE.TILE_HIT, this, TargetTile);
+            EventManager.Instance.emit(EVENT_TYPE.TILE_HIT, this, TargetTile);
             Effect.gameObject.SetActive(true);
             Effect.Play();
             collider.enabled = false;

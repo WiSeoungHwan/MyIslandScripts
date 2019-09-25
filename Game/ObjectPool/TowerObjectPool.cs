@@ -23,7 +23,6 @@ namespace MyIsland_InGame
     public class TowerObjectPool : SingletonMonoBehaviour<TowerObjectPool>
     {
         #region Serialize Field
-        [SerializeField]
         private GameObject[] towerPrefabs;
         #endregion
 
@@ -36,7 +35,8 @@ namespace MyIsland_InGame
         #region MonoBehaviour Callbacks
         protected override void OnAwake(){
             base.OnAwake();
-
+            towerPrefabs = AllBuildings.Instance.GetSelectedTowerPrefabs();
+            Debug.Log(towerPrefabs.Length + "towerPrefabs length");
             for(int i = 0; i < towerPrefabs.Length; i++){
                 GameObjectPool<GameObject> objPool = new GameObjectPool<GameObject>(10, () => {
                     GameObject obj = Instantiate(towerPrefabs[i]);
@@ -47,9 +47,6 @@ namespace MyIsland_InGame
                 });
                 towerPoolDictionary.Add((TowerPoolList)i,objPool);
             }
-            
-            
-            
         }
         #endregion
 

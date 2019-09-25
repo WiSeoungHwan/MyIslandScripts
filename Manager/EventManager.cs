@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EVENT_TYPE_SINGLE {
+public enum EVENT_TYPE {
     MATERIAL_COLLECT,
     ENEMYMATERAIL_COLLECT,
     TABLE_COUNT_CHANGE,
@@ -22,13 +22,13 @@ public enum EVENT_TYPE_SINGLE {
 
 public class EventManager: DontDestroy<EventManager> 
 {
-    public delegate void OnEvent(EVENT_TYPE_SINGLE eventType, Component sender, object param = null);
+    public delegate void OnEvent(EVENT_TYPE eventType, Component sender, object param = null);
     // 리스너 오브젝트 딕셔너리 or 배열
-    private Dictionary<EVENT_TYPE_SINGLE, List<OnEvent>> Listeners = new Dictionary<EVENT_TYPE_SINGLE, List<OnEvent>>();
+    private Dictionary<EVENT_TYPE, List<OnEvent>> Listeners = new Dictionary<EVENT_TYPE, List<OnEvent>>();
    
 
     // 리스너 배열에 리스너 추가
-    public void on(EVENT_TYPE_SINGLE eventType, OnEvent listener)
+    public void on(EVENT_TYPE eventType, OnEvent listener)
     {
         List<OnEvent> ListenList = null;
 
@@ -44,7 +44,7 @@ public class EventManager: DontDestroy<EventManager>
 
     }
     // 이벤트를 리스너에게 전달
-    public void emit(EVENT_TYPE_SINGLE EventType, Component Sender, object Param = null)
+    public void emit(EVENT_TYPE EventType, Component Sender, object Param = null)
     {
         List<OnEvent> ListenList = null;
         if (!Listeners.TryGetValue(EventType, out ListenList))
@@ -60,7 +60,7 @@ public class EventManager: DontDestroy<EventManager>
             }
         }
     }
-    public void off(EVENT_TYPE_SINGLE eventType, OnEvent target = null)
+    public void off(EVENT_TYPE eventType, OnEvent target = null)
     {
         if(target == null)
         {        
@@ -91,9 +91,9 @@ public class EventManager: DontDestroy<EventManager>
     }
     public void RemoveRedundancies()
     {
-        Dictionary<EVENT_TYPE_SINGLE, List<OnEvent>> TmpListeners = new Dictionary<EVENT_TYPE_SINGLE, List<OnEvent>>();
+        Dictionary<EVENT_TYPE, List<OnEvent>> TmpListeners = new Dictionary<EVENT_TYPE, List<OnEvent>>();
 
-        foreach(KeyValuePair<EVENT_TYPE_SINGLE, List<OnEvent>> Item in Listeners)
+        foreach(KeyValuePair<EVENT_TYPE, List<OnEvent>> Item in Listeners)
         {
             for(int i = Item.Value.Count - 1; i >= 0; i--)
             {

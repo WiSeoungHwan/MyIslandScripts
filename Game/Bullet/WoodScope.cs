@@ -81,7 +81,7 @@ namespace MyIsland_InGame
                 {
                     i.TileHurt(1);
                 }
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.TILE_HIT,this, i);
+                EventManager.Instance.emit(EVENT_TYPE.TILE_HIT,this, i);
             }
 
             

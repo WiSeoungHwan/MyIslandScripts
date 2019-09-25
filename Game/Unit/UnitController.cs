@@ -60,14 +60,14 @@ namespace MyIsland_InGame
             // 이벤트 리스너 등록
             if (isPlayer)
             {
-                EventManager.Instance.on(EVENT_TYPE_SINGLE.TOWER_WILL_BUILD, TowerButtonTap);
-                EventManager.Instance.on(EVENT_TYPE_SINGLE.TABLE_WILL_BUILD, TableButtonTap);
-                EventManager.Instance.on(EVENT_TYPE_SINGLE.BUNKER_WILL_BUILD, BunkerButtonTap);
-                EventManager.Instance.on(EVENT_TYPE_SINGLE.WILL_BUILD_OFF, BuildOff);
+                EventManager.Instance.on(EVENT_TYPE.TOWER_WILL_BUILD, TowerButtonTap);
+                EventManager.Instance.on(EVENT_TYPE.TABLE_WILL_BUILD, TableButtonTap);
+                EventManager.Instance.on(EVENT_TYPE.BUNKER_WILL_BUILD, BunkerButtonTap);
+                EventManager.Instance.on(EVENT_TYPE.WILL_BUILD_OFF, BuildOff);
             }
 
-            EventManager.Instance.on(EVENT_TYPE_SINGLE.TILE_HIT, IsPlayerHit);
-            EventManager.Instance.on(EVENT_TYPE_SINGLE.TABLE_BROKEN, TableBroken);
+            EventManager.Instance.on(EVENT_TYPE.TILE_HIT, IsPlayerHit);
+            EventManager.Instance.on(EVENT_TYPE.TABLE_BROKEN, TableBroken);
         }
         #endregion
 
@@ -119,6 +119,7 @@ namespace MyIsland_InGame
             unitControl.transform.position = ReturnMovePos(clickTileIndex);
             unitData.unitIndex = clickTileIndex;
             UnitStaminaCount();
+            CheckAround();
         }
         private void Collect(MaterialState materialState, int clickTileIndex)
         { // 플레이어가 자원 타일을 클릭하면 들어오는 함수 
@@ -148,13 +149,14 @@ namespace MyIsland_InGame
             }
             if (isPlayer)
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.MATERIAL_COLLECT, this, unitData.unitMaterial);
+                EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT, this, unitData.unitMaterial);
             }
             else
             {
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.ENEMYMATERAIL_COLLECT, this, unitData.unitMaterial);
+                EventManager.Instance.emit(EVENT_TYPE.ENEMYMATERAIL_COLLECT, this, unitData.unitMaterial);
             }
             UnitStaminaCount();
+            CheckAround();
         }
         private void Build(Tile tile)
         {
@@ -226,7 +228,7 @@ namespace MyIsland_InGame
                                 unitData.unitLevel = 1;
                             }
                             if (isPlayer)
-                                EventManager.Instance.emit(EVENT_TYPE_SINGLE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
+                                EventManager.Instance.emit(EVENT_TYPE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
                             break;
                         case BuildingKind.BUNKER:
                             break;
@@ -238,9 +240,9 @@ namespace MyIsland_InGame
                     {
                         tile.Build();
                         if (isPlayer)
-                            EventManager.Instance.emit(EVENT_TYPE_SINGLE.MATERIAL_COLLECT, this, unitData.unitMaterial);
+                            EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT, this, unitData.unitMaterial);
                         else
-                            EventManager.Instance.emit(EVENT_TYPE_SINGLE.ENEMYMATERAIL_COLLECT, this, unitData.unitMaterial);
+                            EventManager.Instance.emit(EVENT_TYPE.ENEMYMATERAIL_COLLECT, this, unitData.unitMaterial);
                     }
                     continue;
                 }
@@ -250,6 +252,7 @@ namespace MyIsland_InGame
                 UnitStaminaCount();
             else
                 unitUI.ShowMessege("자원이 부족합니다.");
+            CheckAround();
         }
 
         private void BuildTap(Tile tile)
@@ -292,7 +295,7 @@ namespace MyIsland_InGame
                         {
                             tile.UpgradeTable(unitData.unitLevel);
                             unitData.unitLevel++;
-                            EventManager.Instance.emit(EVENT_TYPE_SINGLE.MATERIAL_COLLECT, this, unitData.unitMaterial);
+                            EventManager.Instance.emit(EVENT_TYPE.MATERIAL_COLLECT, this, unitData.unitMaterial);
 
                         }
                         else
@@ -368,8 +371,29 @@ namespace MyIsland_InGame
 
             return nearTileIndexs;
         }
+        
+        private void CheckAround(){
+            if(!isPlayer)
+                return;
+            foreach(var i in unitNearArea){
+                switch(i.name){
+                    case "X1":
+                        i.SetActive(isNearTile(unitData.unitIndex + 5));
+                        break;
+                    case "X-1":
+                        i.SetActive(isNearTile(unitData.unitIndex - 5));
+                        break;
+                    case "Z1":
+                        i.SetActive(isNearTile(unitData.unitIndex + 1));
+                        break;
+                    case "Z-1":
+                        i.SetActive(isNearTile(unitData.unitIndex - 1));
+                        break;
+                }
+            }
+        }
 
-        private void IsPlayerHit(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void IsPlayerHit(EVENT_TYPE eventType, Component sender, object param = null)
         {
             if ((Tile)param)
             {
@@ -394,14 +418,14 @@ namespace MyIsland_InGame
             }
         }
 
-        private void TableBroken(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void TableBroken(EVENT_TYPE eventType, Component sender, object param = null)
         {
             Tile tile = (Tile)sender;
             if (tile.tileData.isPlayerGround == isPlayer)
             {
                 unitData.tableCount--;
                 if (isPlayer)
-                    EventManager.Instance.emit(EVENT_TYPE_SINGLE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
+                    EventManager.Instance.emit(EVENT_TYPE.TABLE_COUNT_CHANGE, this, unitData.tableCount);
             }
         }
         private void PlayerHit(float damage)
@@ -410,7 +434,7 @@ namespace MyIsland_InGame
             if (unitData.unitHp <= 0)
             {
                 unitData.unitHp = 0;
-                EventManager.Instance.emit(EVENT_TYPE_SINGLE.GAMEOVER_UNIT_DIE, this, isPlayer);
+                EventManager.Instance.emit(EVENT_TYPE.GAMEOVER_UNIT_DIE, this, isPlayer);
             }
             unitUI.UnitUIUpdate(unitData);
         }
@@ -421,7 +445,7 @@ namespace MyIsland_InGame
             return new Vector3(tilePos.x, 1f, tilePos.z);
         }
 
-        private void TableButtonTap(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void TableButtonTap(EVENT_TYPE eventType, Component sender, object param = null)
         {
             if (onBunker) { return; }
             var nearTileIndexs = NearTileList(unitData.unitIndex);
@@ -445,7 +469,7 @@ namespace MyIsland_InGame
                 }
             }
         }
-        private void BunkerButtonTap(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void BunkerButtonTap(EVENT_TYPE eventType, Component sender, object param = null)
         {
             if (onBunker) { return; }
             var nearTileIndexs = NearTileList(unitData.unitIndex);
@@ -463,7 +487,7 @@ namespace MyIsland_InGame
             }
         }
 
-        private void TowerButtonTap(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void TowerButtonTap(EVENT_TYPE eventType, Component sender, object param = null)
         {
             if (onBunker) { return; }
             TowerEnum buildingEnum = (TowerEnum)param;
@@ -515,7 +539,7 @@ namespace MyIsland_InGame
             }
         }
 
-        private void BuildOff(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void BuildOff(EVENT_TYPE eventType, Component sender, object param = null)
         {
             var nearTileIndexs = NearTileList(unitData.unitIndex);
             foreach (var i in nearTileIndexs)
@@ -614,22 +638,22 @@ namespace MyIsland_InGame
             switch (buildingIndex)
             {
                 case EnemyBuildingIndex.TOWER_1:
-                    TowerButtonTap(EVENT_TYPE_SINGLE.TOWER_WILL_BUILD, this, TowerEnum.TOWER_1);
+                    TowerButtonTap(EVENT_TYPE.TOWER_WILL_BUILD, this, TowerEnum.TOWER_1);
                     break;
                 case EnemyBuildingIndex.TOWER_2:
-                    TowerButtonTap(EVENT_TYPE_SINGLE.TOWER_WILL_BUILD, this, TowerEnum.TOWER_2);
+                    TowerButtonTap(EVENT_TYPE.TOWER_WILL_BUILD, this, TowerEnum.TOWER_2);
                     break;
                 case EnemyBuildingIndex.TOWER_3:
-                    TowerButtonTap(EVENT_TYPE_SINGLE.TOWER_WILL_BUILD, this, TowerEnum.TOWER_3);
+                    TowerButtonTap(EVENT_TYPE.TOWER_WILL_BUILD, this, TowerEnum.TOWER_3);
                     break;
                 case EnemyBuildingIndex.BUNKER:
-                    BunkerButtonTap(EVENT_TYPE_SINGLE.BUNKER_WILL_BUILD, this, null);
+                    BunkerButtonTap(EVENT_TYPE.BUNKER_WILL_BUILD, this, null);
                     break;
                 case EnemyBuildingIndex.TABLE:
-                    TableButtonTap(EVENT_TYPE_SINGLE.TABLE_WILL_BUILD, this, null);
+                    TableButtonTap(EVENT_TYPE.TABLE_WILL_BUILD, this, null);
                     break;
                 case EnemyBuildingIndex.NONE:
-                    BuildOff(EVENT_TYPE_SINGLE.WILL_BUILD_OFF, this, null);
+                    BuildOff(EVENT_TYPE.WILL_BUILD_OFF, this, null);
                     break;
             }
         }

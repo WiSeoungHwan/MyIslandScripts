@@ -27,7 +27,7 @@ namespace MyIsland_InGame
         {
             this.isPlayerGround = isPlayerGround;
             TileSort(materialInitData, selectedTheme);
-            EventManager.Instance.on(EVENT_TYPE_SINGLE.TOWER_FIRE, TileTargeting);
+            EventManager.Instance.on(EVENT_TYPE.TOWER_FIRE, TileTargeting);
         }
 
         public Tile GetTile(int index)
@@ -43,7 +43,7 @@ namespace MyIsland_InGame
 
         #region Private Methods
 
-        private void TileTargeting(EVENT_TYPE_SINGLE eventType, Component sender, object param = null)
+        private void TileTargeting(EVENT_TYPE eventType, Component sender, object param = null)
         {
             if ((Tower)sender)
             {
