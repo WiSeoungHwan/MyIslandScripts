@@ -23,7 +23,7 @@ public class AllBuildings : DontDestroy<AllBuildings>
             towerDataDic.Add(data.TID, data);
         }
         selectedTowerIDs = new List<string>(){
-            "TWPa1_Lv1",
+            "TWPa1_Lv3",
             "TWSt1_Lv1",
             "TWSc1_Lv1",
             "TRPa1_Lv1",

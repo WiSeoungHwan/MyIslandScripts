@@ -37,7 +37,7 @@ namespace MyIsland_InGame
         [SerializeField]
         private int playTime;
         [SerializeField]
-        private Text fireTimeText;
+        private Image fireTimeBar;
         [SerializeField]
         private int fireTime;
         #endregion
@@ -139,7 +139,7 @@ namespace MyIsland_InGame
             min = (int)curTime / 60;
             sec = (int)curTime % 60;
             timeText.text = min.ToString("00") + ":" + sec.ToString("00");
-            fireTimeText.text = towerFireTime.ToString();
+            fireTimeBar.fillAmount = towerFireTime * 0.1f;
             if (towerFireTime <= 0)
             {
                 towerFireTime = fireTime;

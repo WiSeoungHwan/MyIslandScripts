@@ -83,6 +83,8 @@ namespace MyIsland_InGame
         }
         public void TowerSheetDataInit(TowerSheetData data){
             this._towerSheetData = data;
+            TowerData.towerHp = TowerSheetData.Health;
+            TowerData.towerDamage = TowerSheetData.Damage;
         }
         #endregion
     }
