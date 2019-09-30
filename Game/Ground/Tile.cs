@@ -141,6 +141,7 @@ namespace MyIsland_InGame
             }
             if (onBuildingObject)
             {
+                onBuildingObject.gameObject.SetActive(false);
                 switch (onBuildingObject.buildingKind)
                 {
                     case BuildingKind.TABLE:
@@ -150,11 +151,12 @@ namespace MyIsland_InGame
                         TowerObjectPool.Instance.Remove((TowerPoolList)key, onBuildingObject.gameObject);
                         break;
                     case BuildingKind.BUNKER:
+                        Debug.Log("Remove bunker" + (BunkerPoolList)key);
                         BunkerObjectPool.Instance.Remove((BunkerPoolList)key, onBuildingObject.gameObject);
                         break;
                 }
+                
                 onBuildingObject = null;
-
             }
         }
 

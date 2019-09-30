@@ -29,6 +29,7 @@ namespace MyIsland_InGame
             base.Fire();
             isShoot = true;
             collider.enabled = true;
+            this.gameObject.SetActive(true);
         }
         public override void Hit()
         {
@@ -72,6 +73,7 @@ namespace MyIsland_InGame
                             {
                                 isHiting = true;
                                 i.TileHurt(Damage);
+                                Debug.Log("Building hit");
                                 foreach (var r in routes)
                                 {
                                     r.TargetingSetActive(TowerKind.STRAIGHT, false);
@@ -145,8 +147,14 @@ namespace MyIsland_InGame
 
         IEnumerator PositionReset()
         {
+            this.gameObject.SetActive(false);
             yield return new WaitForSeconds(2.0f);
-            this.transform.localPosition = new Vector3(0f, 0.5f, 0);
+            isShoot = false;
+            foreach (var i in routes)
+            {
+                i.TargetingSetActive(TowerKind.STRAIGHT, false);
+            }
+            this.transform.position = ReturnPos;
             Effect.gameObject.SetActive(false);
             isHiting = false;
             Effect.Stop();

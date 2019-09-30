@@ -39,22 +39,26 @@ namespace MyIsland_InGame
         public GameObject Pop(BunkerPoolList key){
             GameObjectPool<GameObject> pool = bunkerPoolDictionary[key];
             GameObject obj = pool.pop();
+            obj.SetActive(true);
             activeList.Add(obj);
             return obj;
         }
 
         public void Remove(BunkerPoolList key, GameObject obj){
             if(activeList.Remove(obj)){
+                Debug.Log("Count " + activeList.Count + "key " + key);
                 Reset(key,obj);        
             }
+            
         }
         #endregion
 
         #region Private Methods
         private void Reset(BunkerPoolList key, GameObject obj){
             GameObjectPool<GameObject> pool = bunkerPoolDictionary[key];
-            pool.push(obj);
             obj.SetActive(false);
+            pool.push(obj);
+            
         }
         #endregion
         

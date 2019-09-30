@@ -116,7 +116,7 @@ public class ThrowSimulator : MonoBehaviour
 
 
 
-            bullet.transform.LookAt(tpos);
+            //bullet.transform.LookAt(tpos);
 
 
 

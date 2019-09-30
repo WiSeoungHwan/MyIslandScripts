@@ -26,6 +26,15 @@ namespace MyIsland_InGame
         private bool buildingMode;
         #endregion
 
+        #region MonoBehaviour
+        void Start(){
+
+        }
+        void OnDestroy(){
+            
+        }
+        #endregion
+
         #region Public Method
         public void UnitControllerInit(bool isPlayer, GameObject[] selectedTheme, MaterialInitData materialInitData, UnitInitData unitInitData)
         {
@@ -136,15 +145,19 @@ namespace MyIsland_InGame
             {
                 case MaterialState.WOOD:
                     unitData.unitMaterial.wood += unitData.unitDemage;
+                    unitUI.ShowHeadPopUp("나무 + " + unitData.unitDemage);
                     break;
                 case MaterialState.STONE:
                     unitData.unitMaterial.stone += unitData.unitDemage;
+                    unitUI.ShowHeadPopUp("돌 + " + unitData.unitDemage);
                     break;
                 case MaterialState.IRON:
                     unitData.unitMaterial.iron += unitData.unitDemage;
+                    unitUI.ShowHeadPopUp("철 + " + unitData.unitDemage);
                     break;
                 case MaterialState.ADAM:
                     unitData.unitMaterial.adam += unitData.unitDemage;
+                    unitUI.ShowHeadPopUp("아티움 + " + unitData.unitDemage);
                     break;
             }
             if (isPlayer)
@@ -155,11 +168,13 @@ namespace MyIsland_InGame
             {
                 EventManager.Instance.emit(EVENT_TYPE.ENEMYMATERAIL_COLLECT, this, unitData.unitMaterial);
             }
+            
             UnitStaminaCount();
             CheckAround();
         }
         private void Build(Tile tile)
         {
+            
             if (onBunker) { return; }
             if (!isHasStamina())
             {
@@ -402,7 +417,6 @@ namespace MyIsland_InGame
                 if (tile.tileData.isPlayerGround != isPlayer) { return; }
                 switch (bullet.TowerKind)
                 {
-
                     case TowerKind.STRAIGHT:
                         PlayerHit(bullet.Damage);
                         break;
@@ -478,11 +492,13 @@ namespace MyIsland_InGame
                 Tile tile = ground.GetTile(i);
                 if (tile.tileData.tileState == TileState.NORMAL || tile.tileData.tileState == TileState.WILL_BUILD)
                 {
+                    Debug.Log("UnitLevel" +  unitData.unitLevel);
                     if (unitData.unitLevel == 4)
                     {
                         tile.WillBuildBunker((BunkerPoolList)3);
+                    }else{
+                        tile.WillBuildBunker((BunkerPoolList)unitData.unitLevel - 1);
                     }
-                    tile.WillBuildBunker((BunkerPoolList)unitData.unitLevel - 1);
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using DG.Tweening;
 
 namespace MyIsland_InGame
 {
@@ -64,6 +65,7 @@ namespace MyIsland_InGame
         }
         void OnDestroy(){
             EventManager.Instance.off(EVENT_TYPE.GAMEOVER_UNIT_DIE, GameOverUnitDie);
+            EventManager.Instance.clear();
             AudioManager.Instance.StopBGM();
         }
         #endregion
@@ -127,7 +129,7 @@ namespace MyIsland_InGame
             };
             playerController.UnitControllerInit(true, selecetedTheme, playerMaterialInitData, unitInitData);
             enemyController.UnitControllerInit(false, selecetedTheme, EnemyMaterialInitData, unitInitData);
-
+            // FireTimeCount();
             StartCoroutine("OneSecTimer");
         }
 
@@ -139,7 +141,9 @@ namespace MyIsland_InGame
             min = (int)curTime / 60;
             sec = (int)curTime % 60;
             timeText.text = min.ToString("00") + ":" + sec.ToString("00");
-            fireTimeBar.fillAmount = towerFireTime * 0.1f;
+            if(fireTimeBar.fillAmount == 0)
+                fireTimeBar.fillAmount = 1f;
+            fireTimeBar.DOFillAmount(fireTimeBar.fillAmount - 0.1f, 0.3f);
             if (towerFireTime <= 0)
             {
                 towerFireTime = fireTime;
@@ -151,7 +155,7 @@ namespace MyIsland_InGame
             StartCoroutine("OneSecTimer");
         }
         public void GameOverButtonTap(){
-            SceneManager.LoadScene(2);
+            SceneManager.LoadScene("MainScene");
         }
         #endregion
 
@@ -159,6 +163,15 @@ namespace MyIsland_InGame
         private void GameOverUnitDie(EVENT_TYPE eventType, Component sender, object param = null){
             bool isPlayer = (bool)param;
             gameoverPanel.SetActive(true);
+        }
+        private void FireTimeCount(){
+            fireTimeBar.DOFillAmount(0,fireTime).OnComplete(FireTimeCompelte);
+
+        }
+        private void FireTimeCompelte(){
+            EventManager.Instance.emit(EVENT_TYPE.GM_FIRE,this);
+            fireTimeBar.fillAmount = 1f;
+            FireTimeCount();
         }
         #endregion
     }

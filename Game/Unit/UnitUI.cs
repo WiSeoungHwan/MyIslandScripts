@@ -10,6 +10,8 @@ namespace MyIsland_InGame
     {
         #region Serialize Field
         [SerializeField]
+        private Canvas unitCanvas;
+        [SerializeField]
         private Text unitHpText;
 
         [SerializeField]
@@ -24,6 +26,9 @@ namespace MyIsland_InGame
         private RectTransform messegePenel;
         [SerializeField]
         private Text messegeText;
+        [SerializeField]
+        private TextMove headPopUp;
+        
         #endregion
 
         #region Delegate
@@ -38,6 +43,12 @@ namespace MyIsland_InGame
         private Vector3 beforeStaminaPos;
         private bool isShaking;
         private bool isMessegeShowing;
+        private bool isHeadPopUpShowing;
+        #endregion
+        #region MonoBehaviour
+        void Start(){
+            headPopUp.gameObject.SetActive(false);
+        }
         #endregion
 
         #region Public Methods
@@ -70,17 +81,31 @@ namespace MyIsland_InGame
         public void ShowMessege(string messege){
             messegePenel.gameObject.SetActive(true);
             messegeText.text = messege;
-            var beforPos = messegePenel.position;
+            var beforePos = messegePenel.position;
             if(!isMessegeShowing)
-                messegePenel.DOAnchorPosY(-35f,1f, true).SetEase(Ease.InOutQuad).OnComplete(()=>HideMessege(messegePenel,beforPos));
+                messegePenel.DOAnchorPosY(-35f,1f, true).SetEase(Ease.InOutQuad).OnComplete(()=>HideMessege(messegePenel,beforePos));
             isMessegeShowing = true;
+        }
+
+        public void ShowHeadPopUp(string text){
+            TextMove instance = Instantiate(headPopUp);
+            instance.transform.SetParent(unitCanvas.transform, false);
+            instance.gameObject.SetActive(true);
+            instance.SetText(text);
+            
+        }
+        private void ShowHeadPopUpComplete(Vector3 pos){
+            headPopUp.gameObject.SetActive(false);
+            // headPopUp.text = "";
+            headPopUp.transform.position = pos;
+            isHeadPopUpShowing = false;
         }
         
         
         IEnumerator StaminaCoolTime()
         {
             yield return new WaitForSeconds(0.01f);
-            coolTime += 0.005f;
+            coolTime += 0.01f;
             if(coolTime >= 0.2f){
                 unitStaminaImage.fillAmount = staminaUp() * 0.2f;
                 coolTime = 0f;

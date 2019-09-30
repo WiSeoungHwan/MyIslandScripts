@@ -41,7 +41,7 @@ namespace MyIsland_InGame
                 GameObjectPool<GameObject> objPool = new GameObjectPool<GameObject>(10, () => {
                     GameObject obj = Instantiate(towerPrefabs[i]);
                     obj.transform.SetParent(transform);
-                    obj.AddComponent<Tower>();
+                    //obj.AddComponent<Tower>();
                     obj.SetActive(false);
                     return obj;
                 });

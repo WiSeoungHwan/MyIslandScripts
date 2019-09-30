@@ -19,6 +19,7 @@ namespace MyIsland_InGame
         #endregion
         public override void Fire()
         {
+            base.Fire();
             TargetTile.TargetingSetActive(this.TowerKind,true);
             throwSimulator.Shoot(this.transform, this.transform.position, this.TargetTile.transform.position, 10f, 5f, () =>
             {
@@ -26,6 +27,7 @@ namespace MyIsland_InGame
                 Effect.gameObject.SetActive(true);
                 Effect.transform.position = new Vector3(transform.position.x, 1f, transform.position.z);
                 Effect.Play();
+                Hit();
                 EventManager.Instance.emit(EVENT_TYPE.TILE_HIT,this,TargetTile);
                 StartCoroutine("PositionReset");
             });
@@ -35,7 +37,7 @@ namespace MyIsland_InGame
         {
             yield return new WaitForSeconds(2.0f);
             Effect.Stop();
-            this.transform.localPosition = Vector3.zero;
+            this.transform.position = ReturnPos;
         }
     }
 

@@ -15,7 +15,7 @@ public class AudioManager : DontDestroy<AudioManager>
     private AudioClip[] audioClip;
     private Dictionary<string, AudioClip> audioClipsDic;
     
-    // private bool mute = false;
+    private bool mute = false;
 
 
     #region MonoBehaviour
@@ -36,6 +36,15 @@ public class AudioManager : DontDestroy<AudioManager>
         this.sfxSouce.volume = volume;
         this.sfxSouce.PlayOneShot(audioClipsDic[audioName], volume);
     }
+    public void PlaySfx(AudioClip audioClip, float volume = 0.8f){
+        if(audioClip == false){
+            Debug.Log("Sfx is null");
+            return;
+        }
+        sfxSouce.volume = volume;
+        sfxSouce.PlayOneShot(audioClip,volume);
+    }
+
 
     public void PlayBgm(string audioName, float volume = 0.3f)
 	{
@@ -56,7 +65,7 @@ public class AudioManager : DontDestroy<AudioManager>
 
     private void OnMute()
     {
-        // this.mute = !this.mute;
-        // AudioListener.volume = this.mute ? 0 : 1;
+        this.mute = !this.mute;
+        AudioListener.volume = this.mute ? 0 : 1;
     }
 }

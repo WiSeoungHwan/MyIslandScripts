@@ -22,6 +22,10 @@ namespace MyIsland_InGame
         private string _TID;
         [SerializeField]
         private ParticleSystem launchEffect;
+        [SerializeField]
+        private AudioClip launchSound;
+        [SerializeField]
+        private Animator animator;
         
         #endregion
 
@@ -56,7 +60,6 @@ namespace MyIsland_InGame
             BuildComplete = false;
             EventManager.Instance.on(EVENT_TYPE.GM_FIRE,Fire);
             this.buildingKind = BuildingKind.TOWER;
-            
         }
         #endregion
         
@@ -69,13 +72,14 @@ namespace MyIsland_InGame
             WoodStraight straight = (WoodStraight)bullet;
             straight.StraightTargeting(tiles);
         }
-        public void ScopeTargeting(List<Tile> tiles){
-            WoodScope scope = (WoodScope)bullet;
-            scope.ScopeTargeting(tiles);
-        }
         public void Fire(EVENT_TYPE eventType, Component sender, object param = null){
             if(BuildComplete == false){return;}
+            if(launchEffect)
+                launchEffect.Play();
+            AudioManager.Instance.PlaySfx(launchSound);
+            StartCoroutine("PlayBack");
             EventManager.Instance.emit(EVENT_TYPE.TOWER_FIRE,this);
+            
         }
         public void TowerInit(bool isPlayerGround, int tileIndex){
             this.TowerData.isPlayerGround = isPlayerGround;
@@ -86,7 +90,14 @@ namespace MyIsland_InGame
             TowerData.towerHp = TowerSheetData.Health;
             TowerData.towerDamage = TowerSheetData.Damage;
         }
+        IEnumerator PlayBack(){
+            animator.SetBool("Fire", true);
+            yield return new WaitForSeconds(1f);
+            animator.SetBool("Fire", false);
+        }
         #endregion
+
+
     }
 
 }

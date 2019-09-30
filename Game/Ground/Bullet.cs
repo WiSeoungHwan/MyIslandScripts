@@ -11,6 +11,7 @@ namespace MyIsland_InGame
         private Tile _targetTile;
         private float _damage;
         private TowerKind _towerKind;
+        
         #endregion
 
         #region Properties
@@ -34,11 +35,14 @@ namespace MyIsland_InGame
                 return _damage;
             }
         }
+        public Vector3 ReturnPos{get;set;}
         #endregion
 
         #region Serialize Field
         [SerializeField]
         private ParticleSystem _effect;
+        [SerializeField]
+        private AudioClip _sound;
         [SerializeField]
         private GameObject _body;
         #endregion
@@ -46,8 +50,11 @@ namespace MyIsland_InGame
         #region Public Methods
         public virtual void Fire(){
             _body.SetActive(true);
+            ReturnPos = gameObject.transform.position;
         }
         public virtual void Hit(){
+            if(_sound)
+                AudioManager.Instance.PlaySfx(_sound);
             _body.SetActive(false);
         }
         public void Targeting(Tile tile, float damage,TowerKind towerKind, string tag){

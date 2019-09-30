@@ -84,37 +84,6 @@ namespace MyIsland_InGame
                     break;
                 case TowerKind.SCOPE:
                     tile = GetTile(RandomNum(towerData.tileIndex));
-                    int destinationIndex = tile.tileData.index;
-                    List<int> scopeIndex = new List<int>();
-
-                    scopeIndex.Add(destinationIndex);
-                    scopeIndex.Add(destinationIndex + 1);
-                    scopeIndex.Add(destinationIndex - 1);
-                    scopeIndex.Add(destinationIndex + 5);
-                    scopeIndex.Add(destinationIndex - 5);
-                    if (destinationIndex == 4 || ((destinationIndex - 4) % 5) == 0)
-                    {
-                        scopeIndex.Remove(destinationIndex + 1);
-                    }
-                    if (destinationIndex == 0 || destinationIndex % 5 == 0)
-                    {
-                        scopeIndex.Remove(destinationIndex - 1);
-                    }
-                    if (destinationIndex + 5 > 24)
-                    {
-                        scopeIndex.Remove(destinationIndex + 5);
-                    }
-                    if (destinationIndex - 5 < 0)
-                    {
-                        scopeIndex.Remove(destinationIndex - 5);
-                    }
-
-                    List<Tile> scopes = new List<Tile>();
-                    foreach (var i in scopeIndex)
-                    {
-                        scopes.Add(GetTile(i));
-                    }
-                    tower.ScopeTargeting(scopes);
                     tower.Targeting(tile);
                     break;
             }
